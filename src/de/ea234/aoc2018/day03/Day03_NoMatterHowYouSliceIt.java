@@ -20,12 +20,21 @@ import java.util.stream.Collectors;
  * claim id 1            row   1  col   3   width    4    height    4 
  * claim id 2            row   3  col   1   width    4    height    4 
  * claim id 3            row   5  col   5   width    2    height    2 
+ * claim id 1            row   1  col   3   width    4    height    4 
+ * claim id 2            row   3  col   1   width    4    height    4 
+ * claim id 3            row   5  col   5   width    2    height    2 
+ * 
+ * No Overlap #3 @ 5,5: 2x2
  * 
  * Result Part 1 4
+ * Result Part 2 3
  * 
  * ------------------------------------------------------------------------------------------
  * 
+ * No Overlap #275 @ 336,615: 28x21
+ * 
  * Result Part 1 115304
+ * Result Part 2 275
  * 
  * </pre> 
  */
@@ -56,43 +65,65 @@ public class Day03_NoMatterHowYouSliceIt
 
     long result_part_01 = 0;
 
+    String result_part_02 = "";
+
     for ( String input_str : pListInput )
     {
-      int index_at = input_str.indexOf( '@' );
+      /*
+       * Finding the seperators
+       */
+      int index_at    = input_str.indexOf( '@' );
 
       int index_comma = input_str.indexOf( ',', index_at );
 
       int index_colon = input_str.indexOf( ':', index_comma );
 
-      int index_x = input_str.indexOf( 'x', index_colon );
+      int index_x     = input_str.indexOf( 'x', index_colon );
 
-      String claim_id = input_str.substring( 1, index_at ).trim();
+      /*
+       * Reading the Input-Values 
+       */
+      String claim_id     = input_str.substring( 1, index_at ).trim();
 
-      int claim_start_row = Integer.parseInt( input_str.substring( index_at + 1, index_comma ).trim() );
+      int claim_row_start = Integer.parseInt( input_str.substring( index_at + 1, index_comma ).trim() );
 
-      int claim_start_col = Integer.parseInt( input_str.substring( index_comma + 1, index_colon ).trim() );
+      int claim_col_start = Integer.parseInt( input_str.substring( index_comma + 1, index_colon ).trim() );
 
-      int claim_width = Integer.parseInt( input_str.substring( index_colon + 1, index_x ).trim() );
+      int claim_width     = Integer.parseInt( input_str.substring( index_colon + 1, index_x ).trim() );
 
-      int claim_height = Integer.parseInt( input_str.substring( index_x + 1 ).trim() );
+      int claim_height    = Integer.parseInt( input_str.substring( index_x + 1 ).trim() );
 
-      int claim_end_row = claim_start_row + claim_width;
-      int claim_end_col = claim_start_col + claim_height;
+      /*
+       * Calculating the end row and col
+       */
+      int claim_row_end   = claim_row_start + claim_width;
 
-      if ( pKnzDebug )
+      int claim_col_end   = claim_col_start + claim_height;
+
+      /*
+       * Increasing the box-values in the matrix
+       */
+      for ( int cur_row = claim_row_start; cur_row < claim_row_end; cur_row++ )
       {
-        wl( String.format( "claim id %-10s   row %3d  col %3d   width %4d    height %4d ", claim_id, claim_start_row, claim_start_col, claim_width, claim_height ) );
-      }
-
-      for ( int cur_row = claim_start_row; cur_row < claim_end_row; cur_row++ )
-      {
-        for ( int cur_col = claim_start_col; cur_col < claim_end_col; cur_col++ )
+        for ( int cur_col = claim_col_start; cur_col < claim_col_end; cur_col++ )
         {
           matrix[ cur_row ][ cur_col ]++;
         }
       }
+
+      /*
+       * Do some debug stuff
+       */      
+      if ( pKnzDebug )
+      {
+        wl( String.format( "claim id %-10s   row %3d  col %3d   width %4d    height %4d ", claim_id, claim_row_start, claim_col_start, claim_width, claim_height ) );
+      }
+
     }
 
+    /*
+     * Adding all matrix-cells, which have a value greater than 1.
+     */
     for ( int cur_row = 0; cur_row < 1000; cur_row++ )
     {
       for ( int cur_col = 0; cur_col < 1000; cur_col++ )
@@ -104,12 +135,88 @@ public class Day03_NoMatterHowYouSliceIt
       }
     }
 
+    /*
+     * ************************************************************************
+     * Part 2 - Check if the matrix contains only ones for a claim
+     * ************************************************************************
+     */
+
+    for ( String input_str : pListInput )
+    {
+      /*
+       * Finding the seperators
+       */
+      int index_at    = input_str.indexOf( '@' );
+
+      int index_comma = input_str.indexOf( ',', index_at );
+
+      int index_colon = input_str.indexOf( ':', index_comma );
+
+      int index_x     = input_str.indexOf( 'x', index_colon );
+
+      /*
+       * Reading the Input-Values 
+       */
+      String claim_id     = input_str.substring( 1, index_at ).trim();
+
+      int claim_row_start = Integer.parseInt( input_str.substring( index_at + 1, index_comma ).trim() );
+
+      int claim_col_start = Integer.parseInt( input_str.substring( index_comma + 1, index_colon ).trim() );
+
+      int claim_width     = Integer.parseInt( input_str.substring( index_colon + 1, index_x ).trim() );
+
+      int claim_height    = Integer.parseInt( input_str.substring( index_x + 1 ).trim() );
+
+      /*
+       * Calculating the end row and col
+       */
+      int claim_row_end   = claim_row_start + claim_width;
+
+      int claim_col_end   = claim_col_start + claim_height;
+
+
+      if ( pKnzDebug )
+      {
+        wl( String.format( "claim id %-10s   row %3d  col %3d   width %4d    height %4d ", claim_id, claim_row_start, claim_col_start, claim_width, claim_height ) );
+      }
+      
+      /*
+       * All the matrix-values of the box must be 1.
+       */
+      int claim_overlap = 0;
+
+      for ( int cur_row = claim_row_start; cur_row < claim_row_end; cur_row++ )
+      {
+        for ( int cur_col = claim_col_start; cur_col < claim_col_end; cur_col++ )
+        {
+          if ( matrix[ cur_row ][ cur_col ] > 1 )
+          {
+            claim_overlap++;
+          }
+        }
+      }
+
+      /*
+       * If there was no overlap, the result for part 2 is found.
+       */
+      if ( claim_overlap == 0 )
+      {
+        result_part_02 = claim_id;
+        
+        wl( "" );
+        wl( "No Overlap " + input_str );
+
+        break;
+      }
+    }
+
     wl( "" );
     wl( "Result Part 1 " + result_part_01 );
+    wl( "Result Part 2 " + result_part_02 );
     wl( "" );
     wl( "" );
   }
-
+  
   private static List< String > getListProd()
   {
     List< String > string_array = null;
