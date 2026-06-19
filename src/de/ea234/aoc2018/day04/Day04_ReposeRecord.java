@@ -24,44 +24,42 @@ import java.util.stream.Collectors;
  * 1518-11-03 Guard 10      Sleep from 24 to 29 =  5 | total sleep time   50
  * 1518-11-04 Guard 99      Sleep from 36 to 46 = 10 | total sleep time   20
  * 1518-11-05 Guard 99      Sleep from 45 to 55 = 10 | total sleep time   30
- * 10    - Total Sleep Time   50 - Max-Minute = 24,  Result 240 
- * 99    - Total Sleep Time   30 - Max-Minute = 45,  Result 4455 
+ * 
+ * max_sleep_time_guard_id 99
+ * max_sleep_time_minute   45
+ * max_sleep_time_value    3
+ * 
+ *     0    1    2    3    4    5    6    7    8    9   10   11   12   13   14   15   16   17   18   19   20   21   22   23   24   25   26   27   28   29   30   31   32   33   34   35   36   37   38   39   40   41   42   43   44   45   46   47   48   49   50   51   52   53   54   55   56   57   58   59
+ *     0    0    0    0    0    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    2    1    1    1    1    0    1    1    1    1    1    1    1    1    1    1    2    2    2    2    2    3    2    2    2    2    1    1    1    1    1    0    0    0    0    0
+ *    10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   99   99   99   99   99   99   99   99   99   99   10   10   10   10   10   10   10   10   10   10
  * 
  * Result Part 1 240
- * Result Part 2 0
+ * Result Part 2 4455
  * 
  * 
  * ------------------------------------------------------------------------------------------
  * 1518-03-19 Guard 2953    Sleep from 37 to 41 =  4 | total sleep time    4
+ * 1518-03-20 Guard 457     Sleep from 14 to 26 = 12 | total sleep time   12
+ * 1518-03-21 Guard 691     Sleep from 31 to 59 = 28 | total sleep time   28
+ * 1518-03-22 Guard 503     Sleep from 17 to 36 = 19 | total sleep time   19
+ * 1518-03-23 Guard 223     Sleep from 23 to 55 = 32 | total sleep time   32
+ * ...
+ * 1518-03-28 Guard 2693    Sleep from 18 to 42 = 24 | total sleep time   24
+ * 1518-03-28 Guard 2693    Sleep from 56 to 59 =  3 | total sleep time   27
  * 1518-11-22 Guard 2953    Sleep from 51 to 53 =  2 | total sleep time  465
  * 1518-11-23 Guard 457     Sleep from 24 to 49 = 25 | total sleep time  354
- *
- * 2953  - Total Sleep Time  465 - Max-Minute = 39,  Result 115167 
- * 419   - Total Sleep Time  457 - Max-Minute = 36,  Result 15084 
- * 1699  - Total Sleep Time  453 - Max-Minute = 42,  Result 71358 
- * 1069  - Total Sleep Time  448 - Max-Minute = 30,  Result 32070 
- * 659   - Total Sleep Time  387 - Max-Minute = 30,  Result 19770 
- * 223   - Total Sleep Time  366 - Max-Minute = 43,  Result 9589 
- * 457   - Total Sleep Time  354 - Max-Minute = 25,  Result 11425 
- * 1933  - Total Sleep Time  337 - Max-Minute = 25,  Result 48325 
- * 2039  - Total Sleep Time  306 - Max-Minute = 37,  Result 75443 
- * 691   - Total Sleep Time  297 - Max-Minute = 31,  Result 21421 
- * 179   - Total Sleep Time  274 - Max-Minute = 33,  Result 5907 
- * 1153  - Total Sleep Time  245 - Max-Minute = 47,  Result 54191 
- * 2693  - Total Sleep Time  230 - Max-Minute = 33,  Result 88869 
- * 3547  - Total Sleep Time  226 - Max-Minute = 20,  Result 70940 
- * 647   - Total Sleep Time  200 - Max-Minute = 32,  Result 20704 
- * 401   - Total Sleep Time  161 - Max-Minute = 34,  Result 13634 
- * 503   - Total Sleep Time  151 - Max-Minute = 33,  Result 16599 
- * 409   - Total Sleep Time  149 - Max-Minute = 41,  Result 16769 
- * 163   - Total Sleep Time  147 - Max-Minute = 15,  Result 2445 
- * 2753  - Total Sleep Time  120 - Max-Minute = 41,  Result 112873 
- * 683   - Total Sleep Time    0 - Max-Minute =  0,  Result 0 
- * 3347  - Total Sleep Time    0 - Max-Minute =  0,  Result 0 
- * 1637  - Total Sleep Time    0 - Max-Minute =  0,  Result 0 
+ * 
+ * max_sleep_time_guard_id 1069
+ * max_sleep_time_minute   30
+ * max_sleep_time_value    17
+ * 
+ *     0    1    2    3    4    5    6    7    8    9   10   11   12   13   14   15   16   17   18   19   20   21   22   23   24   25   26   27   28   29   30   31   32   33   34   35   36   37   38   39   40   41   42   43   44   45   46   47   48   49   50   51   52   53   54   55   56   57   58   59
+ *     1    1    2    2    3    3    3    4    4    5    5    6    7    8    8    9   10   11   11   10   10   11   11   11   12   12   13   13   14   15   17   16   14   14   14   14   15   15   15   16   15   13   14   12   13   11   11   12   12   12   12    9   10    9    9    6    6    5    3    0
+ *  1069  419  419  419  659  659  419  419  419  419  419  419  419  419  419  419  419  419  419  419  419  419  419  419  419  419  419  419 1069 1069 1069 1069 2953 2953 2953 2953 2953 2953 2953 2953 2953 2953 1699 2953 1699 1699 1699  223 1069  223  223 2953  223  223  223  223 1699 1699 2953 2953
  * 
  * Result Part 1 115167
- * Result Part 2 0
+ * Result Part 2 32070
+ * 
  * </pre> 
  */
 public class Day04_ReposeRecord
@@ -107,20 +105,26 @@ public class Day04_ReposeRecord
     wl( "" );
     wl( "------------------------------------------------------------------------------------------" );
 
-    int result_part_01 = 0;
+    int result_part_01       = 0;
 
-    int result_part_02 = 0;
+    int result_part_02       = 0;
 
     int minutes_falls_asleep = 0;
 
-    int minutes_wakes_up = 0;
+    int minutes_wakes_up     = 0;
 
     HashMap< String, Guard > hash_map = new HashMap< String, Day04_ReposeRecord.Guard >();
 
     Guard cur_guard = null;
 
+    /*
+     * Sorting the input list
+     */
     pListInput.sort( null );
 
+    /*
+     * Getting the sleep informations from the input list
+     */
     for ( String input_str : pListInput )
     {
       if ( input_str.contains( "begins shift" ) )
@@ -148,14 +152,75 @@ public class Day04_ReposeRecord
       }
     }
 
+    /*
+     * Create a sorted list with the longest sleep time
+     */
+
     List< Guard > guard_list = hash_map.values().stream().sorted( ( a, b ) -> Integer.compare( b.getTotalSleepTime(), a.getTotalSleepTime() ) ).toList();
 
-    for ( Guard c_guard : guard_list )
+    /*
+     * Getting the result for part 1 from the first Guard
+     */
+    result_part_01 = guard_list.get( 0 ).getResultPart01();
+
+    /*
+     * Part 2
+     */
+
+    int[] max_minutes_array_sleeptime = new int[ 60 ];
+    int[] max_minutes_array_guard_id  = new int[ 60 ];
+
+    for ( int cur_minute = 0; cur_minute < 60; cur_minute++ )
     {
-      wl( c_guard.toString() );
+      int max_val = -1;
+
+      for ( Guard c_guard : guard_list )
+      {
+        if ( c_guard.getSleepStatusMinute( cur_minute ) > max_val )
+        {
+          max_val = c_guard.getSleepStatusMinute( cur_minute );
+
+          max_minutes_array_sleeptime[ cur_minute ] = c_guard.getSleepStatusMinute( cur_minute );
+
+          max_minutes_array_guard_id[ cur_minute ] = c_guard.getID();
+        }
+      }
     }
 
-    result_part_01 = guard_list.get( 0 ).getResult1();
+    String dbg_minute     = "";
+    String dbg_sleep_time = "";
+    String dbg_guard_id   = "";
+
+    int max_sleep_time_minute   = -1;
+    int max_sleep_time_value    = -1;
+    int max_sleep_time_guard_id = -1;
+
+    for ( int cur_minute = 0; cur_minute < 60; cur_minute++ )
+    {
+      dbg_minute     += String.format( " %4d", cur_minute );
+      dbg_sleep_time += String.format( " %4d", max_minutes_array_sleeptime[ cur_minute ] );
+      dbg_guard_id   += String.format( " %4d", max_minutes_array_guard_id[ cur_minute ] );
+
+      if ( max_minutes_array_sleeptime[ cur_minute ] > max_sleep_time_value )
+      {
+        max_sleep_time_guard_id = max_minutes_array_guard_id[ cur_minute ];
+
+        max_sleep_time_value    = max_minutes_array_sleeptime[ cur_minute ];
+
+        max_sleep_time_minute   = cur_minute;
+      }
+    }
+
+    wl( "" );
+    wl( "max_sleep_time_guard_id " + max_sleep_time_guard_id );
+    wl( "max_sleep_time_minute   " + max_sleep_time_minute   );
+    wl( "max_sleep_time_value    " + max_sleep_time_value    );
+    wl( "" );
+    wl( dbg_minute );
+    wl( dbg_sleep_time );
+    wl( dbg_guard_id );
+
+    result_part_02 = max_sleep_time_guard_id * max_sleep_time_minute;
 
     wl( "" );
     wl( "Result Part 1 " + result_part_01 );
@@ -195,6 +260,11 @@ public class Day04_ReposeRecord
       return sleep_time_total;
     }
 
+    public int getSleepStatusMinute( int pMinute )
+    {
+      return minutes[ pMinute ];
+    }
+
     public int getID()
     {
       return id;
@@ -211,7 +281,7 @@ public class Day04_ReposeRecord
         if ( minutes[ cur_minute ] > max_val )
         {
           max_minute = cur_minute;
-          
+
           max_val = minutes[ cur_minute ];
         }
       }
@@ -219,14 +289,14 @@ public class Day04_ReposeRecord
       return max_minute;
     }
 
-    public int getResult1()
+    public int getResultPart01()
     {
       return id * getMinute();
     }
 
     public String toString()
     {
-      return String.format( "%-5d - Total Sleep Time %4d - Max-Minute = %2d,  Result %d ", id, sleep_time_total, getMinute(), getResult1() );
+      return String.format( "%-5d - Total Sleep Time %4d - Max-Minute = %2d,  Result %d ", id, sleep_time_total, getMinute(), getResultPart01() );
     }
   }
 
@@ -335,5 +405,4 @@ public class Day04_ReposeRecord
      */
     return null;
   }
-
 }
