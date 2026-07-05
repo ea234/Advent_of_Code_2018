@@ -1,12 +1,6 @@
 package de.ea234.aoc2018.day14;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
-import java.util.stream.Collectors;
 
 /**
  * <pre>
@@ -16,53 +10,57 @@ import java.util.stream.Collectors;
  * 
  * https://www.reddit.com/r/adventofcode/comments/a61ojp/2018_day_14_solutions/
  * 
+ * https://github.com/ea234/Advent_of_Code_2018/blob/main/src/de/ea234/aoc2018/day14/Day14_ChocolateCharts.java
+ *
  * ------------------------------------------------------------------------------------------
  * 
- * Elf 1   Index 141188   Score 7
- * Elf 2   Index 326376   Score 8
+ * Elf 1   Index    2065463   Score 5
+ * Elf 2   Index   14630140   Score 5
  * 
- * score_board_index 327911
- * recipe_count      327911
+ * recipe_count 20229829
+ * recipe_count      20229829
+ * round_nr          15520329
  * 
- * 1 1 1 5 3 1 7 1 1 5 
-
+ * result_part_01    1115317115
+ * result_part_02    20229822
+ * 
  * </pre> 
  */
 public class Day14_ChocolateCharts
 {
   public static void main( String[] args )
   {
-    calculate01( 327901 );
+    calculate( 327901 );
 
     System.exit( 0 );
   }
 
-  public static void calculate01( int pRecipeMax )
+  public static void calculate( int pRecipeMax )
   {
     wl( "" );
     wl( "------------------------------------------------------------------------------------------" );
 
     String result_part_01 = null;
-    int result_part_02 = -1;
 
-    Elf elf_1 = new Elf( 1, 3, 0 );
-    Elf elf_2 = new Elf( 2, 7, 1 );
+    int result_part_02    = -1;
 
-    int[] score_board_vector = new int[ 10_000_000 ];
-
-    int score_board_index = 2;
+    int[] score_board_vector = new int[ 40_000_000 ];
 
     int recipe_count = 2;
-    int recipe_max   = pRecipeMax + 10;
+
+    int recipe_max = pRecipeMax + 10;
 
     int[] digits = String.valueOf( pRecipeMax ).chars().map( c -> c - '0' ).toArray();
 
     score_board_vector[ 0 ] = 3;
     score_board_vector[ 1 ] = 7;
 
+    Elf elf_1 = new Elf( 1, 3, 0 );
+    Elf elf_2 = new Elf( 2, 7, 1 );
+
     int round_nr = 0;
 
-    while ( round_nr < 7_000_000 )
+    while ( round_nr < 17_000_000 )
     {
       /*
        * Calculate the new score value
@@ -74,13 +72,11 @@ public class Day14_ChocolateCharts
         /*
          * If the score value is less than 10, only 1 recipe will be created
          */
-        score_board_vector[ score_board_index ] = new_score;
-
-        score_board_index++;
+        score_board_vector[ recipe_count ] = new_score;
 
         recipe_count++;
 
-        if ( ( result_part_02 == -1 ) && ( checkDigits( score_board_vector, digits, score_board_index ) ) )
+        if ( ( result_part_02 == -1 ) && ( checkDigits( score_board_vector, digits, recipe_count ) ) )
         {
           result_part_02 = recipe_count;
         }
@@ -90,47 +86,42 @@ public class Day14_ChocolateCharts
         /*
          * If the score value is greater than 9, two new recipes will be created
          */
-        score_board_vector[ score_board_index ] = new_score / 10;
-
-        score_board_index++;
+        score_board_vector[ recipe_count ] = new_score / 10;
 
         recipe_count++;
 
-        if ( ( result_part_02 == -1 ) && ( checkDigits( score_board_vector, digits, score_board_index ) ) )
+        if ( ( result_part_02 == -1 ) && ( checkDigits( score_board_vector, digits, recipe_count ) ) )
         {
           result_part_02 = recipe_count;
         }
 
-        score_board_vector[ score_board_index ] = new_score % 10;
-
-        score_board_index++;
+        score_board_vector[ recipe_count ] = new_score % 10;
 
         recipe_count++;
 
-        if ( ( result_part_02 == -1 ) && ( checkDigits( score_board_vector, digits, score_board_index ) ) )
+        if ( ( result_part_02 == -1 ) && ( checkDigits( score_board_vector, digits, recipe_count ) ) )
         {
           result_part_02 = recipe_count;
         }
       }
 
-      //wl( Arrays.toString( score_board_vector ) );
+      if ( score_board_vector.length < 400 )
+      {
+        wl( Arrays.toString( score_board_vector ) );
+      }
 
       if ( recipe_count == recipe_max )
       {
-        result_part_01 = getVString( score_board_vector, score_board_index - 10, score_board_index );
+        result_part_01 = getVectorString( score_board_vector, recipe_count - 10, recipe_count );
       }
-
-      /*
-       * --------------------------------------------------------
-       */
 
       if ( ( result_part_01 != null ) && ( result_part_02 != -1 ) )
       {
         break;
       }
 
-      elf_1.moveCurIndex( score_board_index );
-      elf_2.moveCurIndex( score_board_index );
+      elf_1.moveCurIndex( recipe_count );
+      elf_2.moveCurIndex( recipe_count );
 
       elf_1.setRecipeScore( score_board_vector[ elf_1.getCurIndex() ] );
       elf_2.setRecipeScore( score_board_vector[ elf_2.getCurIndex() ] );
@@ -142,12 +133,11 @@ public class Day14_ChocolateCharts
     wl( elf_1.toString() );
     wl( elf_2.toString() );
     wl( "" );
-    wl( "score_board_index " + score_board_index );
     wl( "recipe_count      " + recipe_count );
     wl( "round_nr          " + round_nr );
     wl( "" );
     wl( "result_part_01    " + result_part_01 );
-    wl( "result_part_02    " + result_part_02 );
+    wl( "result_part_02    " + ( result_part_02 - digits.length ) );
     wl( "" );
   }
 
@@ -173,16 +163,16 @@ public class Day14_ChocolateCharts
     return true;
   }
 
-  private static String getVString( int[] pVector, int pIndexFrom, int pIndexTo )
+  private static String getVectorString( int[] pVector, int pIndexFrom, int pIndexTo )
   {
-    StringBuilder x = new StringBuilder();
+    StringBuilder result_string = new StringBuilder();
 
     for ( int cur_index = pIndexFrom; cur_index < pIndexTo; cur_index++ )
     {
-      x.append( pVector[ cur_index ] );
+      result_string.append( pVector[ cur_index ] );
     }
 
-    return x.toString();
+    return result_string.toString();
   }
 
   private static class Elf
@@ -238,7 +228,7 @@ public class Day14_ChocolateCharts
 
     public String toString()
     {
-      return String.format( "Elf %d   Index %5d   Score %d", elf_nr, cur_index, recipe_score );
+      return String.format( "Elf %d   Index %10d   Score %d", elf_nr, cur_index, recipe_score );
     }
   }
 
