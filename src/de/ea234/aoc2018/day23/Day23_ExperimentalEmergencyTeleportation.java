@@ -130,7 +130,6 @@ import java.util.stream.Collectors;
  * The nanobot nr    7 at 1,1,2 is distance 3 away - count_bots    0
  * The nanobot nr    8 at 1,3,1 is distance 0 away - count_bots    1
  * 
- * 
  * Bot Nr    0  0,0,0  radius 4   bots in range 7
  * Bot Nr    1  1,0,0  radius 1   bots in range 2
  * Bot Nr    2  4,0,0  radius 3   bots in range 2
@@ -142,13 +141,16 @@ import java.util.stream.Collectors;
  * Bot Nr    8  1,3,1  radius 1   bots in range 1
  * 
  * 
- * max_count     7
+ * bot_max_r     Bot Nr    0  0,0,0  radius 4   bots in range 7
  * 
- * bot_max       Bot Nr    0  0,0,0  radius 4   bots in range 7
- * 
- * Result Part 1 0
+ * Result Part 1 7
  * Result Part 2 0
  * 
+ * 
+ * bot_max_r     Bot Nr  497  66874149,45054384,46952893  radius 99487886   bots in range 935
+ * 
+ * Result Part 1 935
+ * Result Part 2 0
  * 
  * </pre> 
  */
@@ -172,7 +174,7 @@ public class Day23_ExperimentalEmergencyTeleportation
 
     calculatePart01( test_input, true );
 
-    //calculate01( getListProd(), false );
+    calculate01( getListProd(), false );
 
     System.exit( 0 );
   }
@@ -186,7 +188,6 @@ public class Day23_ExperimentalEmergencyTeleportation
 
   private static void calculate01( List< String > pListInput, boolean pKnzDebug )
   {
-
     long result_part_01 = 0;
     long result_part_02 = 0;
 
@@ -212,55 +213,51 @@ public class Day23_ExperimentalEmergencyTeleportation
 
     /*
      * *******************************************************************************************************
-     * Calculating the manhatten distance
+     * Calculating the manhatten distance and counting the bots within the radius-distance
      * *******************************************************************************************************
      */
+    long largest_signal_radius = 0;
 
-    long max_count = 0;
+    Nanobot bot_max_radius = null;
 
-    Nanobot bot_max = null;
-
-    for ( Nanobot bot_a : n_b_list )
+    for ( Nanobot nanobot_a : n_b_list )
     {
       if ( pKnzDebug )
       {
         wl( "------------------------------------------------------------------------------------------" );
-        wl( "bot_a " + bot_a.toString() );
+        wl( "bot_a " + nanobot_a.toString() );
         wl( "" );
       }
 
       long count_bots = 0;
 
-      long radius = bot_a.getRadius();
-
-      for ( Nanobot cur_bot : n_b_list )
+      if ( nanobot_a.getRadius() > largest_signal_radius )
       {
-        long cur_distance = bot_a.getManhattenDistance( cur_bot );
+        largest_signal_radius = nanobot_a.getRadius();
 
-        if ( cur_distance <= radius )
+        bot_max_radius = nanobot_a;
+      }
+
+      for ( Nanobot nanobot_b : n_b_list )
+      {
+        long cur_distance = nanobot_a.getManhattenDistance( nanobot_b );
+
+        if ( cur_distance <= nanobot_a.getRadius() )
         {
           count_bots++;
         }
 
         if ( pKnzDebug )
         {
-          wl( String.format( "The nanobot nr %4d at %d,%d,%d is distance %d away - count_bots %4d", cur_bot.getBotNr(), cur_bot.getPosX(), cur_bot.getPosY(), cur_bot.getPosZ(), cur_distance, count_bots ) );
+          wl( String.format( "The nanobot nr %4d at %d,%d,%d is distance %d away - count_bots %4d", nanobot_b.getBotNr(), nanobot_b.getPosX(), nanobot_b.getPosY(), nanobot_b.getPosZ(), cur_distance, count_bots ) );
         }
       }
 
-      bot_a.setCountBots( count_bots );
-
-      if ( count_bots > max_count )
-      {
-        max_count = count_bots;
-
-        bot_max = bot_a;
-      }
+      nanobot_a.setCountBots( count_bots );
     }
 
     if ( pKnzDebug )
     {
-      wl( "" );
       wl( "" );
 
       for ( Nanobot cur_bot : n_b_list )
@@ -271,10 +268,10 @@ public class Day23_ExperimentalEmergencyTeleportation
       wl( "" );
     }
 
+    result_part_01 = bot_max_radius.getCountBots();
+
     wl( "" );
-    wl( "max_count     " + max_count );
-    wl( "" );
-    wl( "bot_max       " + bot_max.toString() );
+    wl( "bot_max_r     " + bot_max_radius.toString() );
     wl( "" );
     wl( "Result Part 1 " + result_part_01 );
     wl( "Result Part 2 " + result_part_02 );
@@ -303,11 +300,11 @@ public class Day23_ExperimentalEmergencyTeleportation
 
       matcher.find();
 
-      pos_x = Long.parseLong( matcher.group( 1 ) );
+      pos_x  = Long.parseLong( matcher.group( 1 ) );
 
-      pos_y = Long.parseLong( matcher.group( 2 ) );
+      pos_y  = Long.parseLong( matcher.group( 2 ) );
 
-      pos_z = Long.parseLong( matcher.group( 3 ) );
+      pos_z  = Long.parseLong( matcher.group( 3 ) );
 
       radius = Long.parseLong( matcher.group( 4 ) );
     }
@@ -350,7 +347,9 @@ public class Day23_ExperimentalEmergencyTeleportation
     public long getManhattenDistance( Nanobot pOtherNanobot )
     {
       long distance_x = calcDistance( pOtherNanobot.getPosX(), pos_x );
+
       long distance_y = calcDistance( pOtherNanobot.getPosY(), pos_y );
+
       long distance_z = calcDistance( pOtherNanobot.getPosZ(), pos_z );
 
       return distance_x + distance_y + distance_z;
@@ -360,11 +359,21 @@ public class Day23_ExperimentalEmergencyTeleportation
     {
       if ( ( pPosA >= 0 ) && ( pPosB >= 0 ) )
       {
-        return Math.abs( pPosA - pPosB );
+        if ( pPosB >= pPosA )
+        {
+          return pPosB - pPosA;
+        }
+
+        return pPosA - pPosB;
       }
 
       if ( ( pPosA <= 0 ) && ( pPosB <= 0 ) )
       {
+        if ( pPosB >= pPosA )
+        {
+          return Math.abs( pPosB - pPosA );
+        }
+
         return Math.abs( pPosA - pPosB );
       }
 
