@@ -1,10 +1,5 @@
 package de.ea234.aoc2018.day22;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
 /**
  * <pre>
  * 
@@ -13,138 +8,120 @@ import java.util.stream.Collectors;
  * 
  * https://www.reddit.com/r/adventofcode/comments/a8i1cy/2018_day_22_solutions/
  * 
- *
- *           1
- * 0123456789012345
- * 
- * M=.|=.|.|=.|=|=.
- * .|=|=|||..|.=...
- * .==|....||=..|==
- * =.|....|.==.|==.
- * =|..==...=.|==..
- * =||.=.=||=|=..|=
- * |.=.===|||..=..|
- * |..==||=.|==|===
- * .=..===..=|.|||.
- * .======|||=|=.|=
- * .===|=|===T===||
- * =|||...|==..|=.|
- * =.=|=.=..=.||==|
- * ||=|=...|==.=|==
- * |=.=||===.|||===
- * ||.|==.|.|.||=||
+ * https://github.com/ea234/Advent_of_Code_2018/blob/main/src/de/ea234/aoc2018/day22/Day22_ModeMaze.java
  * 
  * 
- * 
- * 
- * M..===||...==|||..==
- * =|=.||..===|.|=||=..
- * .==|.|=..==|==...|.|
- * |||....=.==|||=|||.=
- * ==..======|.==|=..|.
- * .|..=.=|===...|=.||=
- * ||...==|==|.=.=.|=.=
- * .|.|.||=.|=|..=|||==
- * |.|..||..|==.|=.|.|.
- * =.|===||=|====.||...
- * .|==.|.=|=T..=|.||..
- * |...|=.=.|=.|.||==..
- * ==.|=.=||==||=||.|.=
- * |.|==..=|.===|====..
- * =.==.|.=|||.===|.==.
- * ..=..=|=.=|||==|.=.|
- * |...=||=||=.|=.==.||
- * ==|===||=|.=|==.||.=
- * .=|||||..==.||.|==.|
- * =..=|.==.||.===|.||.
+ * Generated Map
+ * M=.|=.|.|=.|=|=.|=.=
+ * .|=|=|||..|.=....==.
+ * .==|....||=..|==.||.
+ * =.|....|.==.|==..=|=
+ * =|..==...=.|==..==||
+ * =||.=.=||=|=..|=|=|.
+ * |.=.===|||..=..||||=
+ * |..==||=.|==|====|.=
+ * .=..===..=|.|||.|=..
+ * .======|||=|=.|=||=|
+ * .===|=|===T===||=.=|
+ * =|||...|==..|=.|.=..
+ * =.=|=.=..=.||==||||=
+ * ||=|=...|==.=|====|=
+ * |=.=||===.|||===.=.=
+ * ||.|==.|.|.||=||=.||
+ * .|.|..|||||=.=..=|=.
+ * .=||.|=|..|=|===.|=|
+ * =...||.=|.....=.|..|
+ * =.|=.===....=..||=|.
  * 
  * 
  * Geologic Index
- *            0       48271       96542      144813      193084      241355      289626      337897      386168      434439      482710
- *        16807   145722555    29457600    44918746   144331707    71149568    37892722   150780939    46219239     7540974   251420475
- *        33614    25163505   177774661    39951867    36628480    85191084   188332494    78418209     5271756    59552175    17378590
- *        50421   169008305    54750692   152339320   318917412   122558226    41058360    51615072    34452453     7469970     4257490
- *        67228   119021084    36415358   107429544   102235392    68092920   107504808    81559660      388194    14478790   158301730
- *        84035     9315159    64851216    60431616    38045568    18160033   170837160     5841586    48135443   159199609   117098858
- *       100842     4940722    62125260    10543104     9082824    15769584    62803618   136431335   294191588    78782620   157948585
- *       117649   285905520    34532160   159657120     9938400    63635454   283677620    90659620    85719130    21660759    84059200
- *       134456   191863780    92620080     8110300   154647198   106501176    98119570   192219209    41487390    58109850    61996094
- *       151263    49228464     2117511   330921303     7480890   221476820    97503107   335556270   170483175    63288701   226558166
- *       168070    18764892   292335655     7522585   205610110    59325129   153910054   218797545   258990445    41850694           0
+ *            0       16807       33614       50421       67228       84035      100842      117649      134456      151263      168070
+ *        48271   145722555    25163505   169008305   119021084     9315159     4940722   285905520   191863780    49228464    18764892
+ *        96542    29457600   177774661    54750692    36415358    64851216    62125260    34532160    92620080     2117511   292335655
+ *       144813    44918746    39951867   152339320   107429544    60431616    10543104   159657120     8110300   330921303     7522585
+ *       193084   144331707    36628480   318917412   102235392    38045568     9082824     9938400   154647198     7480890   205610110
+ *       241355    71149568    85191084   122558226    68092920    18160033    15769584    63635454   106501176   221476820    59325129
+ *       289626    37892722   188332494    41058360   107504808   170837160    62803618   283677620    98119570    97503107   153910054
+ *       337897   150780939    78418209    51615072    81559660     5841586   136431335    90659620   192219209   335556270   218797545
+ *       386168    46219239     5271756    34452453      388194    48135443   294191588    85719130    41487390   170483175   258990445
+ *       434439     7540974    59552175     7469970    14478790   159199609    78782620    21660759    58109850    63288701    41850694
+ *       482710   251420475    17378590     4257490   158301730   117098858   157948585    84059200    61996094   226558166           0
  * 
  * 
  * Erosion Level
- *          510        8415       16320        4042       11947       19852        7574       15479        3201       11106       19011
- *        17317        1805       11113       12081        3584        5003        9741       14439         679       13225        1354
- *        13941       15997        3307       10220       17028       19334        5431        7764        4503       12835        1537
- *        10565       16556       14906       18729        6339        7560        6648        7651         582        2770       19570
- *         7189        2443        5736       16128        9007       16171       10660         667        5227        8089        6971
- *         3813       11306        3747        4224        1123       16026        8758        9209       19681       16798       17785
- *          437       16580        2496        8088         984        7171       14815       14948        4690        8881       17120
- *        17244       13835       19740       10100        8874       19148        6065       18277        2439        4910       17698
- *        13868        4692         803       17427        5562       16178       10517       17010       11835        3503       14611
- *        10492        2637       18989        1345       13690        9271       19727       14405       18067       15506        4501
- *         7116       15395        5593       15019        6399        7802       15189       14335        2699       11845         510
+ *          510       17317       13941       10565        7189        3813         437       17244       13868       10492        7116
+ *         8415        1805       15997       16556        2443       11306       16580       13835        4692        2637       15395
+ *        16320       11113        3307       14906        5736        3747        2496       19740         803       18989        5593
+ *         4042       12081       10220       18729       16128        4224        8088       10100       17427        1345       15019
+ *        11947        3584       17028        6339        9007        1123         984        8874        5562       13690        6399
+ *        19852        5003       19334        7560       16171       16026        7171       19148       16178        9271        7802
+ *         7574        9741        5431        6648       10660        8758       14815        6065       10517       19727       15189
+ *        15479       14439        7764        7651         667        9209       14948       18277       17010       14405       14335
+ *         3201         679        4503         582        5227       19681        4690        2439       11835       18067        2699
+ *        11106       13225       12835        2770        8089       16798        8881        4910        3503       15506       11845
+ *        19011        1354        1537       19570        6971       17785       17120       17698       14611        4501         510
  * 
  * 
  * Risk Level
- *            0           0           0           1           1           1           2           2           0           0           0
- *            1           2           1           0           2           2           0           0           1           1           1
- *            0           1           1           2           0           2           1           0           0           1           1
- *            2           2           2           0           0           0           0           1           0           1           1
- *            1           1           0           0           1           1           1           1           1           1           2
- *            0           2           0           0           1           0           1           2           1           1           1
- *            2           2           0           0           0           1           1           2           1           1           2
- *            0           2           0           2           0           2           2           1           0           2           1
- *            2           0           2           0           0           2           2           0           0           2           1
- *            1           0           2           1           1           1           2           2           1           2           1
- *            0           2           1           1           0           2           0           1           2           1           0
+ *            0           1           0           2           1           0           2           0           2           1           0
+ *            0           2           1           2           1           2           2           2           0           0           2
+ *            0           1           1           2           0           0           0           0           2           2           1
+ *            1           0           2           0           0           0           0           2           0           1           1
+ *            1           2           0           0           1           1           0           0           0           1           0
+ *            1           2           2           0           1           0           1           2           2           1           2
+ *            2           0           1           0           1           1           1           2           2           2           0
+ *            2           0           0           1           1           2           2           1           0           2           1
+ *            0           1           0           0           1           1           1           0           0           1           2
+ *            0           1           1           1           1           1           1           2           2           2           1
+ *            0           1           1           1           2           1           2           1           1           1           0
  * 
  * 
- * Result Part 1 93
+ * Result Part 1 114
+ * 
+ * Result Part 1 7915
  * 
  * </pre> 
  */
 public class Day22_ModeMaze
 {
-  private static final Pattern PATTERN           = Pattern.compile( "pos=<(-?\\d+),(-?\\d+),(-?\\d+)>, r=(-?\\d+)" );
+  private static final long MULTIPLICATOR_Y     = 48271;
 
-  private static final long    MULTIPLICATOR_ROW = 16807;
+  private static final long MULTIPLICATOR_X     = 16807;
 
-  private static final long    MULTIPLICATOR_COL = 48271;
+  private static final long MODULO_NUMBER       = 20183;
 
-  private static final long    MODULO_NUMBER     = 20183;
+  private static final int  SET_MAP             = 0;
 
-  private static final char    CHAR_ROCKY        = '.';
+  private static final int  SET_GEOLOGIC_INDEX  = 1;
 
-  private static final char    CHAR_WET          = '=';
+  private static final int  SET_EROSION_LEVEL   = 2;
 
-  private static final char    CHAR_NARROW       = '|';
+  private static final int  SET_RISK_LEVEL      = 3;
 
-  private static final char    CHAR_TARGET       = 'T';
+  private static final char CHAR_ROCKY          = '.';
 
-  private static final char    CHAR_MOUTH        = 'M';
+  private static final char CHAR_WET            = '=';
+
+  private static final char CHAR_NARROW         = '|';
+
+  private static final char CHAR_TARGET         = 'T';
+
+  private static final char CHAR_MOUTH          = 'M';
 
   public static void main( String[] args )
   {
-    calculate( 510, 10, 10 );
+    calculate(  510, 10,  10, true  );
+
+    calculate( 3339, 10, 715, false );
 
     System.exit( 0 );
   }
 
-  public static void calculate( int pCaveDepth, int pTargetRow, int pTargetCol )
+  public static void calculate( int pCaveDepth, int pTargetX, int pTargetY, boolean pKnzDebug )
   {
-    int set_map            = 0;
-    int set_geologic_index = 1;
-    int set_erosion_level  = 2;
-    int set_risk_level     = 3;
+    int grid_height = Math.max( pTargetY + 5, 10 );
 
-    long cave_depth = pCaveDepth;
-    int target_row  = pTargetRow;
-    int target_col  = pTargetCol;
-
-    int grid_width  = Math.max( target_row + 2, 20 );
-    int grid_height = Math.max( target_col + 2, 20 );
+    int grid_width  = Math.max( pTargetX + 5, 10 );
 
     long[][][] grid_map = new long[ 4 ][ grid_height + 1 ][ grid_width + 1 ];
 
@@ -154,54 +131,54 @@ public class Day22_ModeMaze
      * *******************************************************************************************************
      */
 
-    for ( int cur_row = 0; cur_row < grid_height; cur_row++ )
+    for ( int cur_y = 0; cur_y < grid_height; cur_y++ )
     {
-      for ( int cur_col = 0; cur_col < grid_width; cur_col++ )
+      for ( int cur_x = 0; cur_x < grid_width; cur_x++ )
       {
         long geologic_index = 0;
 
-        if ( cur_row == 0 )
+        if ( cur_y == 0 )
         {
           /*
-           * If the region's X (=row) coordinate is 0, the geologic index is its Y coordinate times 48271.
+           * If the region's Y coordinate is 0, the geologic index is its X coordinate times 16807.
            */
-          geologic_index = cur_col * MULTIPLICATOR_COL;
+          geologic_index = cur_x * MULTIPLICATOR_X;
         }
-        else if ( cur_col == 0 )
+        else if ( cur_x == 0 )
         {
           /*
-           * If the region's Y (=col) coordinate is 0, the geologic index is its X coordinate times 16807.
+           * If the region's X coordinate is 0, the geologic index is its Y coordinate times 48271.
            */
-          geologic_index = cur_row * MULTIPLICATOR_ROW;
+          geologic_index = cur_y * MULTIPLICATOR_Y;
         }
-        else if ( ( cur_row == target_row ) && ( cur_col == target_col ) )
+        else if ( ( cur_y == pTargetY ) && ( cur_x == pTargetX ) )
         {
           /*
            * The region at the coordinates of the target has a geologic index of 0.
            */
           geologic_index = 0;
         }
-        else if ( ( cur_row > 0 ) || ( cur_col > 0 ) )
+        else if ( ( cur_y > 0 ) || ( cur_x > 0 ) )
         {
           /*
            * Otherwise, the region's geologic index is the result of multiplying 
            * the erosion levels of the regions at X-1,Y and X,Y-1.
            */
-          long erosion_level_1 = grid_map[ set_erosion_level ][ cur_row - 1 ][ cur_col ];
+          long erosion_level_1 = grid_map[ SET_EROSION_LEVEL ][ cur_y - 1 ][ cur_x     ];
 
-          long erosion_level_2 = grid_map[ set_erosion_level ][ cur_row ][ cur_col - 1 ];
+          long erosion_level_2 = grid_map[ SET_EROSION_LEVEL ][ cur_y     ][ cur_x - 1 ];
 
           geologic_index = erosion_level_1 * erosion_level_2;
         }
 
-        grid_map[ set_geologic_index ][ cur_row ][ cur_col ] = geologic_index;
+        grid_map[ SET_GEOLOGIC_INDEX ][ cur_y ][ cur_x ] = geologic_index;
 
         /*
          * A region's erosion level is its geologic index plus the cave system's depth, modulo 20183.
          */
-        long erosion_level = ( geologic_index + cave_depth ) % MODULO_NUMBER;
+        long erosion_level = ( geologic_index + pCaveDepth ) % MODULO_NUMBER;
 
-        grid_map[ set_erosion_level ][ cur_row ][ cur_col ] = erosion_level;
+        grid_map[ SET_EROSION_LEVEL ][ cur_y ][ cur_x ] = erosion_level;
 
         /*
          * Type:
@@ -211,21 +188,20 @@ public class Day22_ModeMaze
          */
         long region_type = erosion_level % 3l;
 
-             if ( region_type == 0 ) grid_map[ set_map ][ cur_row ][ cur_col ] = CHAR_ROCKY;
-        else if ( region_type == 1 ) grid_map[ set_map ][ cur_row ][ cur_col ] = CHAR_WET;
-        else if ( region_type == 2 ) grid_map[ set_map ][ cur_row ][ cur_col ] = CHAR_NARROW;
+             if ( region_type == 0 ) grid_map[ SET_MAP ][ cur_y ][ cur_x ] = CHAR_ROCKY;
+        else if ( region_type == 1 ) grid_map[ SET_MAP ][ cur_y ][ cur_x ] = CHAR_WET;
+        else if ( region_type == 2 ) grid_map[ SET_MAP ][ cur_y ][ cur_x ] = CHAR_NARROW;
 
         /*
          * The risk level of for a region: 0 for rocky regions, 1 for wet regions, and 2 for narrow regions.
-         * (=equal to the region_type)
+         * (=equal to the type)
          */
-        grid_map[ set_risk_level ][ cur_row ][ cur_col ] = region_type;
-
+        grid_map[ SET_RISK_LEVEL ][ cur_y ][ cur_x ] = region_type;
       }
     }
 
-    grid_map[ set_map ][ target_row ][ target_col ] = CHAR_TARGET;
-    grid_map[ set_map ][ 0          ][ 0          ] = CHAR_MOUTH;
+    grid_map[ SET_MAP ][ pTargetY ][ pTargetX ] = CHAR_TARGET;
+    grid_map[ SET_MAP ][ 0        ][ 0        ] = CHAR_MOUTH;
 
     /*
      * *******************************************************************************************************
@@ -235,26 +211,29 @@ public class Day22_ModeMaze
 
     long result_part_01 = 0;
 
-    for ( int cur_row = 0; cur_row < target_row; cur_row++ )
+    for ( int cur_row = 0; cur_row <= pTargetY; cur_row++ )
     {
-      for ( int cur_col = 0; cur_col < target_col; cur_col++ )
+      for ( int cur_col = 0; cur_col <= pTargetX; cur_col++ )
       {
-        result_part_01 += grid_map[ set_risk_level ][ cur_row ][ cur_col ];
+        result_part_01 += grid_map[ SET_RISK_LEVEL ][ cur_row ][ cur_col ];
       }
     }
 
-    wl( "" );
-    wl( "" );
-    wl( getDebugGridChar( grid_map, set_map, 0, 0, grid_height, grid_width ) );
-    wl( "" );
-    wl( "Geologic Index" );
-    wl( getDebugGridNumber( grid_map, set_geologic_index, 0, 0, target_row + 1, target_col + 1 ) );
-    wl( "" );
-    wl( "Erosion Level" );
-    wl( getDebugGridNumber( grid_map, set_erosion_level, 0, 0, target_row + 1, target_col + 1 ) );
-    wl( "" );
-    wl( "Risk Level" );
-    wl( getDebugGridNumber( grid_map, set_risk_level, 0, 0, target_row + 1, target_col + 1 ) );
+    if ( pKnzDebug )
+    {
+      wl( "Generated Map" );
+      wl( getDebugGridChar( grid_map, SET_MAP, 0, 0, grid_height, grid_width ) );
+      wl( "" );
+      wl( "Geologic Index" );
+      wl( getDebugGridNumber( grid_map, SET_GEOLOGIC_INDEX, 0, 0, pTargetY + 1, pTargetX + 1 ) );
+      wl( "" );
+      wl( "Erosion Level" );
+      wl( getDebugGridNumber( grid_map, SET_EROSION_LEVEL, 0, 0, pTargetY + 1, pTargetX + 1 ) );
+      wl( "" );
+      wl( "Risk Level" );
+      wl( getDebugGridNumber( grid_map, SET_RISK_LEVEL, 0, 0, pTargetY + 1, pTargetX + 1 ) );
+    }
+
     wl( "" );
     wl( "Result Part 1 " + result_part_01 );
   }
