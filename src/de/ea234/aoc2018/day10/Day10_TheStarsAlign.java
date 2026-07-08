@@ -127,6 +127,15 @@ import java.util.stream.Collectors;
  */
 public class Day10_TheStarsAlign
 {
+  /*
+   * Credit:
+   * https://www.reddit.com/user/Leirbagosaurus/
+   * https://imgur.com/4p2J3rK
+   */
+  private static final String STR_CHRISTMAS_TREE  = new String(Character.toChars(0x1F384)) + "\uFE0F";
+  
+  private static final String STR_STAR = "\u2B50\uFE0F";
+  
   public static void main( String[] args )
   {
     String test_input = "";
@@ -299,7 +308,9 @@ public class Day10_TheStarsAlign
         }
 
         wl( "" );
-        wl( getDebugMap( star_grid, cur_grid_y_min, cur_grid_x_min, cur_grid_y_max + 2, cur_grid_x_max + 2 ) );
+        wl( getDebugMap( star_grid, cur_grid_y_min, cur_grid_x_min, cur_grid_y_max + 2, cur_grid_x_max + 2 , false ) );
+        wl( "" );
+        wl( getDebugMap( star_grid, cur_grid_y_min- 1, cur_grid_x_min- 1, cur_grid_y_max + 2, cur_grid_x_max + 2 , true ) );      }
       }
     }
 
@@ -307,7 +318,7 @@ public class Day10_TheStarsAlign
     wl( "Result Part 2 " + min_rect_second );
   }
 
-  private static String getDebugMap( Properties pGrid, long pGridX1, long pGridY1, long pGridX2, long pGridY2 )
+  private static String getDebugMap( Properties pGrid, long pGridX1, long pGridY1, long pGridX2, long pGridY2, boolean pKnzFancyPancy )
   {
     StringBuilder debug_map = new StringBuilder();
 
@@ -315,7 +326,15 @@ public class Day10_TheStarsAlign
     {
       for ( long cur_y = pGridY1; cur_y < pGridY2; cur_y++ )
       {
+        if ( pKnzFancyPancy ) 
+        {
+          debug_map.append( pGrid.getProperty( "R" + cur_x + "C" + cur_y, "." ).charAt( 0 ) == '.' ? STR_CHRISTMAS_TREE : STR_STAR );
+          
+        }
+        else
+        {
         debug_map.append( pGrid.getProperty( "R" + cur_x + "C" + cur_y, "." ) );
+        }
       }
 
       debug_map.append( "\n" );
