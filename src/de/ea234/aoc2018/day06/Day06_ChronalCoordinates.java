@@ -1,5 +1,6 @@
 package de.ea234.aoc2018.day06;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -9,6 +10,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
+import de.system.FkLogger;
+
 /**
  * <pre>
  * 
@@ -16,20 +19,31 @@ import java.util.stream.Collectors;
  * https://adventofcode.com/2018/day/6
  * 
  * https://www.reddit.com/r/adventofcode/comments/a3kr4r/2018_day_6_solutions/
- *
- * ------------------------------------------------------------------------------------------
+ * 
+ * https://github.com/ea234/Advent_of_Code_2018/blob/main/src/de/ea234/aoc2018/day06/Day06_ChronalCoordinates.java
+ * 
+ * ..........    AAAAA.CCCC    AAAAA.CCCC     0     2    1    2    3    4    0    5    4    3    4
+ * .A........    A-AAA.CCCC    A........C     1     1    0    1    2    3    0    4    3    2    3
+ * ..........    AAADDECCCC    A........C     2     2    1    2    2    3    3    3    2    1    2
+ * ........C.    AADDDECC-C    A........C     3     3    2    2    1    2    2    2    1    0    1
+ * ...D......    ..D-DEECCC    .........C     4     0    0    1    0    1    1    2    2    1    2
+ * .....E....    BB.DE-EECC    B........C     5     2    1    0    1    1    0    1    2    2    3
+ * .B........    B-B.EEEE..    B.........     6     1    0    1    0    2    1    2    3    0    0
+ * ..........    BBB.EEEFFF    B........F     7     2    1    2    0    3    2    3    3    2    3
+ * ..........    BBB.EEFFFF    B........F     8     3    2    3    0    4    3    3    2    1    2
+ * ........F.    BBB.FFFF-F    BBB.FFFF-F     9     4    3    4    0    4    3    2    1    0    1
  * 
  * 
- * ..........    AAAAA.CCCC    AAAAA.CCCC         2     1     2     3     4     0     5     4     3     4
- * .A........    A-AAA.CCCC    A........C         1     0     1     2     3     0     4     3     2     3
- * ..........    AAADDECCCC    A........C         2     1     2     2     3     3     3     2     1     2
- * ........C.    AADDDECC-C    A........C         3     2     2     1     2     2     2     1     0     1
- * ...D......    ..D-DEECCC    .........C         0     0     1     0     1     1     2     2     1     2
- * .....E....    BB.DE-EECC    B........C         2     1     0     1     1     0     1     2     2     3
- * .B........    B-B.EEEE..    B.........         1     0     1     0     2     1     2     3     0     0
- * ..........    BBB.EEEFFF    B........F         2     1     2     0     3     2     3     3     2     3
- * ..........    BBB.EEFFFF    B........F         3     2     3     0     4     3     3     2     1     2
- * ........F.    BBB.FFFF-F    BBB.FFFF-F         4     3     4     0     4     3     2     1     0     1
+ * ..........     0    54   48   46   44   44   44   46   48   50   56
+ * ..........     1    48   42   40   38   38   38   40   42   44   50
+ * ..........     2    44   38   36   34   34   34   36   38   40   46
+ * ...###....     3    40   34   32   30   30   30   32   34   36   42
+ * ..#####...     4    38   32   30   28   28   28   30   32   34   40
+ * ..#####...     5    38   32   30   28   28   28   30   32   34   40
+ * ...###....     6    40   34   32   30   30   30   32   34   36   42
+ * ..........     7    44   38   36   34   34   34   36   38   40   46
+ * ..........     8    48   42   40   38   38   38   40   42   44   50
+ * ..........     9    52   46   44   42   42   42   44   46   48   54
  * 
  * 
  * List of coordinates
@@ -40,7 +54,10 @@ import java.util.stream.Collectors;
  * ID  4  E   X   5  Y   5    Count     17
  * ID  5  F   X   8  Y   9    Count     13
  * 
- * Result Part 1    17  Char E
+ * Result Part 1  17  Char E
+ * Result Part 2  16
+ * 
+ * 
  * 
  * ------------------------------------------------------------------------------------------
  * 
@@ -97,23 +114,34 @@ import java.util.stream.Collectors;
  * ID 48  w   X 333  Y 137    Count   6193
  * ID 49  x   X 117  Y  68    Count   8016
  * 
- * Result Part 1 3647  Char I
- *
+ * Result Part 1  3647  Char I
+ * Result Part 2  41605
+ *  *
  * </pre> 
  */
 public class Day06_ChronalCoordinates
 {
-  private static final char   CHAR_SPACE            = '.';
+  private static final char   CHAR_SPOT_SUM                   = '#';
 
-  private static final int    SET_COORDINATES       = 0;
+  private static final char   CHAR_NO_VALUE                   = ' ';
 
-  private static final int    SET_OUTPUT_CHAR       = 1;
+  private static final char   CHAR_ORIGIN_COORDINATE          = '-';
 
-  private static final int    SET_OUTPUT_INFI_CHARS = 2;
+  private static final char   CHAR_SPACE                      = '.';
 
-  private static final int    SET_OUTPUT_DISTANCE   = 3;
+  private static final int    SET_COORDINATES                 = 0;
 
-  private static final String STR_COMBINE_SPACER    = "    ";
+  private static final int    SET_OUTPUT_CHAR                 = 1;
+
+  private static final int    SET_OUTPUT_INFI_CHARS           = 2;
+
+  private static final int    SET_OUTPUT_DISTANCE             = 3;
+
+  private static final int    SET_OUTPUT_PART_2__SUM_MD_CHAR  = 4;
+
+  private static final int    SET_OUTPUT_PART_2__SUM_MD_VALUE = 5;
+
+  private static final String STR_COMBINE_SPACER              = "    ";
 
   public static void main( String[] args )
   {
@@ -126,19 +154,19 @@ public class Day06_ChronalCoordinates
     test_input += ";5, 5";
     test_input += ";8, 9";
 
-    calculatePart01( test_input, 10, 10, true );
+    calculatePart01( test_input, 10, 10, 32, true );
 
-    calculate01( getListProd(), 400, 400, false );
+    calculate01( getListProd(), 400, 400, 10_000, false );
   }
 
-  private static void calculatePart01( String pString, int pGridHeight, int pGridWidth, boolean pKnzDebug )
+  private static void calculatePart01( String pString, int pGridHeight, int pGridWidth, int pManhattenDistanceP2, boolean pKnzDebug )
   {
     List< String > converted_string_list = Arrays.stream( pString.split( ";" ) ).collect( Collectors.toList() );
 
-    calculate01( converted_string_list, pGridHeight, pGridWidth, pKnzDebug );
+    calculate01( converted_string_list, pGridHeight, pGridWidth, pManhattenDistanceP2, pKnzDebug );
   }
 
-  private static void calculate01( List< String > pListInput, int pGridHeight, int pGridWidth, boolean pKnzDebug )
+  private static void calculate01( List< String > pListInput, int pGridHeight, int pGridWidth, int pManhattenDistanceP2, boolean pKnzDebug )
   {
     int grid_height = pGridHeight;
 
@@ -172,7 +200,7 @@ public class Day06_ChronalCoordinates
      * *******************************************************************************************************
      */
 
-    int[][][] grid_map = new int[ 63 ][ pGridHeight ][ pGridWidth ];
+    int[][][] grid_map = new int[ 6 ][ pGridHeight ][ pGridWidth ];
 
     for ( Coordinate coordinate_inst : coordinates_list )
     {
@@ -183,9 +211,14 @@ public class Day06_ChronalCoordinates
     {
       for ( int cur_x = 0; cur_x < grid_width; cur_x++ )
       {
-        int min_md = Integer.MAX_VALUE;
+        int manhatten_distance_min_value = Integer.MAX_VALUE;
 
-        char grid_c_char = ' ';
+        char grid_coordinates_char = CHAR_NO_VALUE;
+
+        /*
+         * For part 2, calculate the sum of all manhatten distances to the current position 
+         */
+        int manhatten_distance_sum = 0;
 
         /*
          * 1. Calculate the min manhatten distance
@@ -194,14 +227,24 @@ public class Day06_ChronalCoordinates
         {
           int manhatten_distance = coordinate_inst.calcManhattenDistance( cur_x, cur_y );
 
-          if ( manhatten_distance < min_md )
+          manhatten_distance_sum += manhatten_distance;
+
+          if ( manhatten_distance < manhatten_distance_min_value )
           {
-            min_md = manhatten_distance;
+            manhatten_distance_min_value = manhatten_distance;
 
-            grid_c_char = coordinate_inst.getCharX();
+            grid_coordinates_char = coordinate_inst.getCharX();
           }
+        }
 
-          grid_map[ 5 + coordinate_inst.getID() ][ cur_y ][ cur_x ] = manhatten_distance;
+        /*
+         * Part 2
+         */
+        grid_map[ SET_OUTPUT_PART_2__SUM_MD_VALUE ][ cur_y ][ cur_x ] = manhatten_distance_sum;
+
+        if ( manhatten_distance_sum < pManhattenDistanceP2 )
+        {
+          grid_map[ SET_OUTPUT_PART_2__SUM_MD_CHAR ][ cur_y ][ cur_x ] = CHAR_SPOT_SUM;
         }
 
         /*
@@ -209,13 +252,13 @@ public class Day06_ChronalCoordinates
          */
         for ( Coordinate coordinate_inst : coordinates_list )
         {
-          if ( grid_c_char != coordinate_inst.getCharX() )
+          if ( grid_coordinates_char != coordinate_inst.getCharX() )
           {
             int manhatten_distance = coordinate_inst.calcManhattenDistance( cur_x, cur_y );
 
-            if ( manhatten_distance == min_md )
+            if ( manhatten_distance == manhatten_distance_min_value )
             {
-              grid_c_char = '.';
+              grid_coordinates_char = CHAR_SPACE;
             }
           }
         }
@@ -227,12 +270,12 @@ public class Day06_ChronalCoordinates
          * 
          * Otherwise, the char 
          */
-        grid_map[ SET_OUTPUT_CHAR ][ cur_y ][ cur_x ] = min_md == 0 ? '-' : grid_c_char;
+        grid_map[ SET_OUTPUT_CHAR ][ cur_y ][ cur_x ] = manhatten_distance_min_value == 0 ? CHAR_ORIGIN_COORDINATE : grid_coordinates_char;
 
         /*
          * Distance Output Grid
          */
-        grid_map[ SET_OUTPUT_DISTANCE ][ cur_y ][ cur_x ] = grid_c_char == '.' ? 0 : min_md;
+        grid_map[ SET_OUTPUT_DISTANCE ][ cur_y ][ cur_x ] = grid_coordinates_char == CHAR_SPACE ? 0 : manhatten_distance_min_value;
       }
     }
 
@@ -274,7 +317,7 @@ public class Day06_ChronalCoordinates
 
     int result_part_01 = 0;
 
-    char result_char = '#';
+    char result_char = CHAR_SPOT_SUM;
 
     for ( Coordinate coordinate_inst : coordinates_list )
     {
@@ -315,26 +358,27 @@ public class Day06_ChronalCoordinates
 
     if ( pKnzDebug )
     {
-      String debug_map_coordinates     = getDebugGridChar( grid_map, SET_COORDINATES,       0, 0, grid_height, grid_width );
+      String debug_map_coordinates        = getDebugGridChar( grid_map, SET_COORDINATES,       0, 0, grid_height, grid_width );
 
-      String debug_map_output_char     = getDebugGridChar( grid_map, SET_OUTPUT_CHAR,       0, 0, grid_height, grid_width );
+      String debug_map_output_char        = getDebugGridChar( grid_map, SET_OUTPUT_CHAR,       0, 0, grid_height, grid_width );
 
-      String debug_map_output_ichar    = getDebugGridChar( grid_map, SET_OUTPUT_INFI_CHARS, 0, 0, grid_height, grid_width );
+      String debug_map_output_ichar       = getDebugGridChar( grid_map, SET_OUTPUT_INFI_CHARS, 0, 0, grid_height, grid_width );
 
-      String debug_map_output_distance = getDebugGridNumber( grid_map, SET_OUTPUT_DISTANCE, 0, 0, grid_height, grid_width );
+      String debug_map_output_sum_md_char = getDebugGridChar( grid_map, SET_OUTPUT_PART_2__SUM_MD_CHAR, 0, 0, grid_height, grid_width );
+
+      String debug_map_output_distance    = getDebugGridNumber( grid_map, SET_OUTPUT_DISTANCE,             0, 0, grid_height, grid_width );
+
+      String debug_map_output_sum_md      = getDebugGridNumber( grid_map, SET_OUTPUT_PART_2__SUM_MD_VALUE, 0, 0, grid_height, grid_width );
 
       wl( "" );
       wl( combineStrings( combineStrings( combineStrings( debug_map_coordinates, debug_map_output_char ), debug_map_output_ichar ), debug_map_output_distance ) );
       wl( "" );
+      wl( "" );
+      wl( combineStrings( debug_map_output_sum_md_char, debug_map_output_sum_md ) );
+      wl( "" );
     }
-    //else 
-    //{
-    //  String debug_map_output_char = getDebugGridChar( grid_map, SET_OUTPUT_CHAR, 0, 0, grid_height, grid_width );
-    //
-    //  wl( "" );
-    //  wl( debug_map_output_char );
-    //  wl( "" );
-    //}
+
+    int result_part_02 = countGridChar( grid_map, SET_OUTPUT_PART_2__SUM_MD_CHAR, 0, 0, grid_height, grid_width, CHAR_SPOT_SUM );
 
     wl( "" );
     wl( "List of coordinates" );
@@ -345,7 +389,10 @@ public class Day06_ChronalCoordinates
     }
 
     wl( "" );
-    wl( "Result Part 1 " + result_part_01 + "  Char " + result_char );
+    wl( "Result Part 1  " + result_part_01 + "  Char " + result_char );
+    wl( "Result Part 2  " + result_part_02 );
+    wl( "" );
+    wl( "" );
   }
 
   private static int countGridChar( int[][][] pGrid, int pSet, int pRowStart, int pColStart, int pRowEnd, int pColEnd, char pChar )
@@ -396,9 +443,11 @@ public class Day06_ChronalCoordinates
 
     for ( int cur_row = pRowStart; cur_row < pRowEnd; cur_row++ )
     {
+      dbg_string.append( " " + cur_row + " " );
+
       for ( int cur_col = pColStart; cur_col < pColEnd; cur_col++ )
       {
-        dbg_string.append( String.format( " %5d", pGrid[ pSet ][ cur_row ][ cur_col ] ) );
+        dbg_string.append( String.format( " %4d", pGrid[ pSet ][ cur_row ][ cur_col ] ) );
       }
 
       dbg_string.append( "\n" );
@@ -459,11 +508,6 @@ public class Day06_ChronalCoordinates
       pos_y = Integer.parseInt( value_vector[ 1 ] );
     }
 
-    public int getID()
-    {
-      return id;
-    }
-
     public int getPosX()
     {
       return pos_x;
@@ -477,16 +521,6 @@ public class Day06_ChronalCoordinates
     public char getCharX()
     {
       return char_coordinates;
-    }
-
-    public int getCountNr()
-    {
-      return count_nr;
-    }
-
-    public void incCountNr()
-    {
-      count_nr++;
     }
 
     public void setCountNr( int pCountNr )
@@ -507,17 +541,6 @@ public class Day06_ChronalCoordinates
 
   private static int calcDistance( int pPosA, int pPosB )
   {
-    /*
-     * see also:
-     * 
-     * --- Day 23: Experimental Emergency Teleportation ---
-     * https://adventofcode.com/2018/day/23
-     * 
-     * https://www.reddit.com/r/adventofcode/comments/a8s17l/2018_day_23_solutions/
-     * 
-     * https://github.com/ea234/Advent_of_Code_2018/blob/main/src/de/ea234/aoc2018/day23/Day23_ExperimentalEmergencyTeleportation.java
-     */
-
     if ( ( pPosA >= 0 ) && ( pPosB >= 0 ) )
     {
       if ( pPosB >= pPosA )
@@ -546,7 +569,8 @@ public class Day06_ChronalCoordinates
     List< String > string_array = null;
 
     String datei_input = "C:/Daten/00_Daten/advent_of_code_2018__day06_input.txt";
- 
+    //String datei_input = "/mnt/hd4tbb/daten/zdownload/advent_of_code_2018__day06_inputb.txt";
+
     try
     {
       string_array = Files.readAllLines( Path.of( datei_input ) );
