@@ -3,9 +3,17 @@ package de.ea234.aoc2018.day16;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
+
+import javax.print.attribute.HashAttributeSet;
 
 /**
  * <pre>
@@ -15,7 +23,8 @@ import java.util.stream.Collectors;
  * 
  * https://www.reddit.com/r/adventofcode/comments/a6mf8a/2018_day_16_solutions/
  * 
- * Your puzzle answer was 500.
+ * https://github.com/ea234/Advent_of_Code_2018/blob/main/src/de/ea234/aoc2018/day16/Day16_ChronalClassification.java
+ *
  * 
  * 
  * Sample  285 - OpCode  0 - Instructions  2 - Before Set 0    2    0    1    0    After Set 1    2    3    1    0    Instructions Set 3    0    0    2    1 
@@ -430,13 +439,94 @@ import java.util.stream.Collectors;
  * Sample  635 - OpCode 15 - Instructions  4 - Before Set 0    0    0    3    3    After Set 1    0    3    3    3    Instructions Set 3   15    0    3    1 
  * Sample  666 - OpCode 15 - Instructions  4 - Before Set 0    1    1    3    1    After Set 1    1    1    3    3    Instructions Set 3   15    0    2    3 
  * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+           ADDR    ADDI    MULR    MULI    BANR    BANI    BORR    BORI    SETR    SETI    GTIR    GTRI    GTRR    EQIR    EQRI    EQRR 
+Code 10        0       0       0      56       0       0       0       0       0       0       0       0       0       0       0       0  MULI
+Code  3        0      59       0      59       0       0       0       0       0       0       0       0       0       0       0       0  ADDI MULI
+Code  7        0      16      56      40       0       0       0       0       0       0       0       0       0       0       0       0  ADDI MULI MULR
+Code  0       42       0       9       0       0       0      51       0       0       0       0       0       0       0       0       0  ADDR MULR BORR
+Code  1       40      40      40      40       0       0       0       0       0       0       0       0       0       0       0       0  ADDR ADDI MULR MULI
+
+Code 11        0       0       0       0      47       0       0       0       0      47       0       0       0       0       0       0  BANR SETI
+Code 14        0       0       0       0      26      55       0       0       0      29       0       0       0       0       0       0  BANR BANI SETI
+
+
+Code  2        0       0      44      44      44      44      44      44      44       0      44       0       0       0      44      44  MULR MULI BANR BANI BORR BORI SETR GTIR EQRI EQRR
+Code  4        0       0       0      54      40      54       0      54      54       0      14       0       0       0      54       0  MULI BANR BANI BORI SETR GTIR EQRI
+Code  5        7      20      46      46      46      46       7      20      46      26      39      46      46      46      26      39  ADDR ADDI MULR MULI BANR BANI BORR BORI SETR SETI GTIR GTRI GTRR EQIR EQRI EQRR
+Code  6        0      59      59       0      59       0      59      59      59       0      59      59       0       0       0      59  ADDI MULR BANR BORR BORI SETR GTIR GTRI EQRR
+Code  8       14      20       4       7      39      30      57      57      57      57       0       0       0       0       0       0  ADDR ADDI MULR MULI BANR BANI BORR BORI SETR SETI
+Code  9       59      59       0       0       0       0      59      59       0       0      59       0       0       0       0       0  ADDR ADDI BORR BORI GTIR
+Code 12       37      52      15       0       0       0      52      52       0      52       0       0       0       0       0       0  ADDR ADDI MULR BORR BORI SETI
+Code 13       46      46      46      46      46      46      46      46      46      46      46      46      46       0       0       0  ADDR ADDI MULR MULI BANR BANI BORR BORI SETR SETI GTIR GTRI GTRR
+Code 15       30      30      13      13       0       0      43      43       0       0       0       0       0       0       0       0  ADDR ADDI MULR MULI BORR BORI
+ * 
+ * 
+ * 
+ * 
+ *              |   ADDR    ADDI    MULR    MULI    BANR    BANI    BORR    BORI    SETR    SETI    GTIR    GTRI    GTRR    EQIR    EQRI    EQRR 
+ * Code  0    3 |      42       0       9       0       0       0      51       0       0       0       0       0       0       0       0       0  ADDR MULR BORR
+ * Code  1    4 |      40      40      40      40       0       0       0       0       0       0       0       0       0       0       0       0  ADDR ADDI MULR MULI
+ * Code  2   10 |       0       0      44      44      44      44      44      44      44       0      44       0       0       0      44      44  MULR MULI BANR BANI BORR BORI SETR GTIR EQRI EQRR
+ * Code  3    2 |       0      59       0      59       0       0       0       0       0       0       0       0       0       0       0       0  ADDI MULI
+ * Code  4    7 |       0       0       0      54      40      54       0      54      54       0      14       0       0       0      54       0  MULI BANR BANI BORI SETR GTIR EQRI
+ * Code  5   16 |       7      20      46      46      46      46       7      20      46      26      39      46      46      46      26      39  ADDR ADDI MULR MULI BANR BANI BORR BORI SETR SETI GTIR GTRI GTRR EQIR EQRI EQRR
+ * Code  6    9 |       0      59      59       0      59       0      59      59      59       0      59      59       0       0       0      59  ADDI MULR BANR BORR BORI SETR GTIR GTRI EQRR
+ * Code  7    3 |       0      16      56      40       0       0       0       0       0       0       0       0       0       0       0       0  ADDI MULR MULI
+ * Code  8   10 |      14      20       4       7      39      30      57      57      57      57       0       0       0       0       0       0  ADDR ADDI MULR MULI BANR BANI BORR BORI SETR SETI
+ * Code  9    5 |      59      59       0       0       0       0      59      59       0       0      59       0       0       0       0       0  ADDR ADDI BORR BORI GTIR
+ * Code 10    1 |       0       0       0      56       0       0       0       0       0       0       0       0       0       0       0       0  MULI
+ * Code 11    2 |       0       0       0       0      47       0       0       0       0      47       0       0       0       0       0       0  BANR SETI
+ * Code 12    6 |      37      52      15       0       0       0      52      52       0      52       0       0       0       0       0       0  ADDR ADDI MULR BORR BORI SETI
+ * Code 13   13 |      46      46      46      46      46      46      46      46      46      46      46      46      46       0       0       0  ADDR ADDI MULR MULI BANR BANI BORR BORI SETR SETI GTIR GTRI GTRR
+ * Code 14    3 |       0       0       0       0      26      55       0       0       0      29       0       0       0       0       0       0  BANR BANI SETI
+ * Code 15    6 |      30      30      13      13       0       0      43      43       0       0       0       0       0       0       0       0  ADDR ADDI MULR MULI BORR BORI
+ * 
+ * 
+ * 
+ * 
+ *              |   ADDR    ADDI    MULR    MULI    BANR    BANI    BORR    BORI    SETR    SETI    GTIR    GTRI    GTRR    EQIR    EQRI    EQRR 
+ * Code 10    1 |       0       0       0      56       0       0       0       0       0       0       0       0       0       0       0       0  MULI
+ * Code  3    2 |       0      59       0      59       0       0       0       0       0       0       0       0       0       0       0       0  ADDI MULI
+ * Code 11    2 |       0       0       0       0      47       0       0       0       0      47       0       0       0       0       0       0  BANR SETI
+ * Code  0    3 |      42       0       9       0       0       0      51       0       0       0       0       0       0       0       0       0  ADDR MULR BORR
+ * Code  7    3 |       0      16      56      40       0       0       0       0       0       0       0       0       0       0       0       0  ADDI MULR MULI
+ * Code 14    3 |       0       0       0       0      26      55       0       0       0      29       0       0       0       0       0       0  BANR BANI SETI
+ * Code  1    4 |      40      40      40      40       0       0       0       0       0       0       0       0       0       0       0       0  ADDR ADDI MULR MULI
+ * Code  9    5 |      59      59       0       0       0       0      59      59       0       0      59       0       0       0       0       0  ADDR ADDI BORR BORI GTIR
+ * Code 12    6 |      37      52      15       0       0       0      52      52       0      52       0       0       0       0       0       0  ADDR ADDI MULR BORR BORI SETI
+ * Code 15    6 |      30      30      13      13       0       0      43      43       0       0       0       0       0       0       0       0  ADDR ADDI MULR MULI BORR BORI
+ * Code  4    7 |       0       0       0      54      40      54       0      54      54       0      14       0       0       0      54       0  MULI BANR BANI BORI SETR GTIR EQRI
+ * Code  6    9 |       0      59      59       0      59       0      59      59      59       0      59      59       0       0       0      59  ADDI MULR BANR BORR BORI SETR GTIR GTRI EQRR
+ * Code  2   10 |       0       0      44      44      44      44      44      44      44       0      44       0       0       0      44      44  MULR MULI BANR BANI BORR BORI SETR GTIR EQRI EQRR
+ * Code  8   10 |      14      20       4       7      39      30      57      57      57      57       0       0       0       0       0       0  ADDR ADDI MULR MULI BANR BANI BORR BORI SETR SETI
+ * Code 13   13 |      46      46      46      46      46      46      46      46      46      46      46      46      46       0       0       0  ADDR ADDI MULR MULI BANR BANI BORR BORI SETR SETI GTIR GTRI GTRR
+ * Code  5   16 |       7      20      46      46      46      46       7      20      46      26      39      46      46      46      26      39  ADDR ADDI MULR MULI BANR BANI BORR BORI SETR SETI GTIR GTRI GTRR EQIR EQRI EQRR
+ * 
  * </pre> 
  */
 public class Day16_ChronalClassification
 {
-  private static int SET_0               = 0;
+  private static int OP_CODE_MULI        = 10;
 
-  private static int SET_1               = 1;
+  private static int OP_CODE_ADDI        = 3;
+
+  private static int OP_CODE_MULR        = 7;
+
+  private static int OP_CODE_BORR        = 0;
+
+  private static int OP_CODE_BANI        = 14;
+
+  private static int OP_CODE_ADDR        = 1;
+
+  private static int SET_BEFORE          = 0;
+
+  private static int SET_AFTER           = 1;
 
   private static int SET_TEST_OUTPUT     = 2;
 
@@ -485,15 +575,17 @@ public class Day16_ChronalClassification
     wl( "" );
     wl( "------------------------------------------------------------------------------------------" );
 
+    HashMap< Integer, OpCode > hm_op = new HashMap< Integer, OpCode >();
+
     int[][] register = new int[ 4 ][ 4 ];
 
     int result_part_01 = 0;
 
-    int sample_count  = 0;
+    int sample_count = 0;
 
-    int set_input     = SET_0;
+    int set_input = SET_BEFORE;
 
-    int set_output    = SET_1;
+    int set_output = SET_AFTER;
 
     for ( int cur_idx = 0; cur_idx < pListInput.size(); cur_idx++ )
     {
@@ -522,13 +614,22 @@ public class Day16_ChronalClassification
 
           String after_str = pListInput.get( cur_idx );
 
-          setValues( before_str,   register, set_input, set_output );
+          setValues( before_str, register );
 
-          setValues( after_str,    register, set_input, set_output );
+          setValues( after_str, register );
 
-          setValues( instructions, register, set_input, set_output );
+          setValues( instructions, register );
 
-          int behave_count = doTestBehave( register, set_input, set_output );
+          OpCode test_op_code = hm_op.get( Integer.valueOf( register[ SET_INSTRUCTIONS ][ INSTRUCTION_OPCODDE ] ) );
+
+          if ( test_op_code == null )
+          {
+            test_op_code = new OpCode( register[ SET_INSTRUCTIONS ][ INSTRUCTION_OPCODDE ] );
+
+            hm_op.put( Integer.valueOf( register[ SET_INSTRUCTIONS ][ INSTRUCTION_OPCODDE ] ), test_op_code );
+          }
+
+          int behave_count = test_op_code.doTestBehave1( register );
 
           wl( String.format( "Sample %4d - OpCode %2d - Instructions %2d - Before %s   After %s   Instructions %s", sample_count, register[ SET_INSTRUCTIONS ][ INSTRUCTION_OPCODDE ], behave_count, getDebugStr( register, set_input ), getDebugStr( register, set_output ), getDebugStr( register, SET_INSTRUCTIONS ) ) );
 
@@ -538,47 +639,174 @@ public class Day16_ChronalClassification
     }
 
     wl( "" );
+    wl( "" );
+    wl( "" );
+    wl( "" );
+
+    List< Integer > keys = new ArrayList<>( hm_op.keySet() );
+
+    wl( "             |" + hm_op.get( keys.get( 0 ) ).getop() );
+
+    Collections.sort( keys );
+
+    for ( Integer k : keys )
+    {
+      hm_op.get( k ).doResCount();
+
+      wl( hm_op.get( k ).toString() );
+    }
+
+    List< OpCode > list = hm_op.values().stream().sorted( Comparator.comparingInt( OpCode::getResCount ) ).collect( Collectors.toList() );
+
+    wl( "" );
+    wl( "" );
+    wl( "" );
+    wl( "" );
+    wl( "             |" + hm_op.get( keys.get( 0 ) ).getop() );
+
+    for ( OpCode k : list )
+    {
+      wl( k.toString() );
+    }
+
+    wl( "" );
     wl( "Result Part 1 " + result_part_01 );
   }
 
-  private static int doTestBehave( int[][] pRegister, int pSetInput, int pSetOutput )
+  private static class OpCode
   {
-    int sum_check = 0;
+    private int   op_code   = -1;
 
-    for ( int test_inst = 0; test_inst < 16; test_inst++ )
+    private int[] stats     = new int[ 16 ];
+
+    private int   res_count = 0;
+
+    public OpCode( int pOpCode )
     {
-      /*
-       * Copy the Register-Values from the Before-State to the Test set
-       */
-      copyValues( pRegister, pSetInput, SET_TEST_OUTPUT );
-
-      /*
-       * Do the Instruction
-       */
-           if ( test_inst ==  0 ) doADDR( pRegister, pSetInput, SET_TEST_OUTPUT );
-      else if ( test_inst ==  1 ) doADDI( pRegister, pSetInput, SET_TEST_OUTPUT );
-      else if ( test_inst ==  2 ) doMULR( pRegister, pSetInput, SET_TEST_OUTPUT );
-      else if ( test_inst ==  3 ) doMULI( pRegister, pSetInput, SET_TEST_OUTPUT );
-      else if ( test_inst ==  4 ) doBANR( pRegister, pSetInput, SET_TEST_OUTPUT );
-      else if ( test_inst ==  5 ) doBANI( pRegister, pSetInput, SET_TEST_OUTPUT );
-      else if ( test_inst ==  6 ) doBORR( pRegister, pSetInput, SET_TEST_OUTPUT );
-      else if ( test_inst ==  7 ) doBORI( pRegister, pSetInput, SET_TEST_OUTPUT );
-      else if ( test_inst ==  8 ) doSETR( pRegister, pSetInput, SET_TEST_OUTPUT );
-      else if ( test_inst ==  9 ) doSETI( pRegister, pSetInput, SET_TEST_OUTPUT );
-      else if ( test_inst == 10 ) doGTIR( pRegister, pSetInput, SET_TEST_OUTPUT );
-      else if ( test_inst == 11 ) doGTRI( pRegister, pSetInput, SET_TEST_OUTPUT );
-      else if ( test_inst == 12 ) doGTRR( pRegister, pSetInput, SET_TEST_OUTPUT );
-      else if ( test_inst == 13 ) doEQIR( pRegister, pSetInput, SET_TEST_OUTPUT );
-      else if ( test_inst == 14 ) doEQRI( pRegister, pSetInput, SET_TEST_OUTPUT );
-      else if ( test_inst == 15 ) doEQRR( pRegister, pSetInput, SET_TEST_OUTPUT );
-
-      /*
-       * Check the Registervalues agains the given AFTER-State
-       */
-      sum_check += doCheck( pRegister, pSetOutput, SET_TEST_OUTPUT );
+      op_code = pOpCode;
     }
 
-    return sum_check;
+    private int doTestBehave1( int[][] pRegister )
+    {
+      int sum_check = 0;
+
+      for ( int test_inst = 0; test_inst < 16; test_inst++ )
+      {
+        /*
+         * Copy the Register-Values from the Before-State to the Test set
+         */
+        copyValues( pRegister, SET_BEFORE, SET_TEST_OUTPUT );
+
+        /*
+         * Do the Instruction
+         */
+        if ( test_inst == 0 ) doADDR( pRegister, SET_BEFORE, SET_TEST_OUTPUT );
+        else if ( test_inst == 1 ) doADDI( pRegister, SET_BEFORE, SET_TEST_OUTPUT );
+        else if ( test_inst == 2 ) doMULR( pRegister, SET_BEFORE, SET_TEST_OUTPUT );
+        else if ( test_inst == 3 ) doMULI( pRegister, SET_BEFORE, SET_TEST_OUTPUT );
+        else if ( test_inst == 4 ) doBANR( pRegister, SET_BEFORE, SET_TEST_OUTPUT );
+        else if ( test_inst == 5 ) doBANI( pRegister, SET_BEFORE, SET_TEST_OUTPUT );
+        else if ( test_inst == 6 ) doBORR( pRegister, SET_BEFORE, SET_TEST_OUTPUT );
+        else if ( test_inst == 7 ) doBORI( pRegister, SET_BEFORE, SET_TEST_OUTPUT );
+        else if ( test_inst == 8 ) doSETR( pRegister, SET_BEFORE, SET_TEST_OUTPUT );
+        else if ( test_inst == 9 ) doSETI( pRegister, SET_BEFORE, SET_TEST_OUTPUT );
+        else if ( test_inst == 10 ) doGTIR( pRegister, SET_BEFORE, SET_TEST_OUTPUT );
+        else if ( test_inst == 11 ) doGTRI( pRegister, SET_BEFORE, SET_TEST_OUTPUT );
+        else if ( test_inst == 12 ) doGTRR( pRegister, SET_BEFORE, SET_TEST_OUTPUT );
+        else if ( test_inst == 13 ) doEQIR( pRegister, SET_BEFORE, SET_TEST_OUTPUT );
+        else if ( test_inst == 14 ) doEQRI( pRegister, SET_BEFORE, SET_TEST_OUTPUT );
+        else if ( test_inst == 15 ) doEQRR( pRegister, SET_BEFORE, SET_TEST_OUTPUT );
+
+        /*
+         * Check the Registervalues agains the given AFTER-State
+         */
+        int check_result = doCheck( pRegister, SET_AFTER, SET_TEST_OUTPUT );
+
+        if ( check_result == 1 )
+        {
+          stats[ test_inst ]++;
+
+          sum_check++;
+        }
+      }
+
+      return sum_check;
+    }
+
+    public String getOpCodeBez( int test_inst )
+    {
+      if ( test_inst == 0 ) return "ADDR";
+      else if ( test_inst == 1 ) return "ADDI";
+      else if ( test_inst == 2 ) return "MULR";
+      else if ( test_inst == 3 ) return "MULI";
+      else if ( test_inst == 4 ) return "BANR";
+      else if ( test_inst == 5 ) return "BANI";
+      else if ( test_inst == 6 ) return "BORR";
+      else if ( test_inst == 7 ) return "BORI";
+      else if ( test_inst == 8 ) return "SETR";
+      else if ( test_inst == 9 ) return "SETI";
+      else if ( test_inst == 10 ) return "GTIR";
+      else if ( test_inst == 11 ) return "GTRI";
+      else if ( test_inst == 12 ) return "GTRR";
+      else if ( test_inst == 13 ) return "EQIR";
+      else if ( test_inst == 14 ) return "EQRI";
+      else if ( test_inst == 15 ) return "EQRR";
+
+      return "X";
+    }
+
+    public String getop()
+    {
+      StringBuilder sb = new StringBuilder();
+
+      for ( int idx = 0; idx < 16; idx++ )
+      {
+        sb.append( String.format( "   %4s ", getOpCodeBez( idx ) ) );
+      }
+
+      return sb.toString();
+    }
+
+    public String getStrStatistik()
+    {
+      StringBuilder sb = new StringBuilder();
+
+      for ( int idx = 0; idx < 16; idx++ )
+      {
+        sb.append( String.format( "    %3d ", stats[ idx ] ) );
+      }
+
+      for ( int idx = 0; idx < 16; idx++ )
+      {
+        if ( stats[ idx ] > 0 )
+        {
+          sb.append( " " + getOpCodeBez( idx ) );
+        }
+      }
+
+      return sb.toString();
+    }
+
+    public void doResCount()
+    {
+      for ( int idx = 0; idx < 16; idx++ )
+      {
+        if ( stats[ idx ] > 0 )
+        {
+          res_count++;
+        }
+      }
+    }
+
+    public int getResCount()
+    {
+      return res_count;
+    }
+
+    public String toString()
+    {
+      return String.format( "Code %2d  %3d | %s", op_code, res_count, getStrStatistik() );
+    }
   }
 
   private static int doCheck( int[][] pRegister, int pSetInput, int pSetOutput )
@@ -800,34 +1028,34 @@ public class Day16_ChronalClassification
     return String.format( "Set %1d  %3d  %3d  %3d  %3d ", pSet, pRegister[ pSet ][ 0 ], pRegister[ pSet ][ 1 ], pRegister[ pSet ][ 2 ], pRegister[ pSet ][ 3 ] );
   }
 
-  private static void setValues( String pInputStr, int[][] pRegister, int pSetInput, int pSetOutput )
+  private static void setValues( String pInputStr, int[][] pRegister )
   {
     int set_to_write = SET_INSTRUCTIONS;
 
     if ( pInputStr.contains( "Before:" ) )
     {
-      set_to_write = pSetInput;
+      set_to_write = SET_BEFORE;
     }
     else if ( pInputStr.contains( "After:" ) )
     {
-      set_to_write = pSetOutput;
+      set_to_write = SET_AFTER;
     }
 
-    String[] values_v;
+    String[] value_vector;
 
     if ( set_to_write != SET_INSTRUCTIONS )
     {
-      values_v = pInputStr.substring( 9, 19 ).split( ", " );
+      value_vector = pInputStr.substring( 9, 19 ).split( ", " );
     }
     else
     {
-      values_v = pInputStr.split( " " );
+      value_vector = pInputStr.split( " " );
     }
 
-    pRegister[ set_to_write ][ REGISTER_0 ] = Integer.parseInt( values_v[ 0 ] );
-    pRegister[ set_to_write ][ REGISTER_1 ] = Integer.parseInt( values_v[ 1 ] );
-    pRegister[ set_to_write ][ REGISTER_2 ] = Integer.parseInt( values_v[ 2 ] );
-    pRegister[ set_to_write ][ REGISTER_3 ] = Integer.parseInt( values_v[ 3 ] );
+    pRegister[ set_to_write ][ REGISTER_0 ] = Integer.parseInt( value_vector[ 0 ] );
+    pRegister[ set_to_write ][ REGISTER_1 ] = Integer.parseInt( value_vector[ 1 ] );
+    pRegister[ set_to_write ][ REGISTER_2 ] = Integer.parseInt( value_vector[ 2 ] );
+    pRegister[ set_to_write ][ REGISTER_3 ] = Integer.parseInt( value_vector[ 3 ] );
   }
 
   private static List< String > getListProd()
@@ -835,6 +1063,8 @@ public class Day16_ChronalClassification
     List< String > string_array = null;
 
     String datei_input = "/mnt/hd4tbb/daten/zdownload/advent_of_code_2018__day16_input.txt";
+
+    datei_input = "C:/Daten/00_Daten/advent_of_code_2018__day16_input.txt";
 
     try
     {
