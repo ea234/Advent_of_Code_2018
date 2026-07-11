@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
  * 
  * https://github.com/ea234/Advent_of_Code_2018/blob/main/src/de/ea234/aoc2018/day13/Day13_MineCartMadness.java
  * 
- * 
  * ------------------------------------------------------------------------------------------
  * 
  * 
@@ -119,41 +118,37 @@ import java.util.stream.Collectors;
  * Result Part 2   6,4
  * 
  * 
- * ------------------------------------------------------------------------------------------
- * 
  * Last mine cart running after 18553 ticks
  * 
  * Crashed mine carts
- * ID  6  G  X  117  Y   62  IsCrashed   true
- * ID 13  N  X  117  Y   62  IsCrashed   true
- * ID  7  H  X   64  Y  107  IsCrashed   true
- * ID  0  A  X   64  Y  107  IsCrashed   true
- * ID 12  M  X  117  Y   53  IsCrashed   true
- * ID  8  I  X  117  Y   53  IsCrashed   true
- * ID  5  F  X  117  Y  149  IsCrashed   true
- * ID  9  J  X  117  Y  149  IsCrashed   true
- * ID  2  C  X   21  Y   53  IsCrashed   true
- * ID 16  Q  X   21  Y   53  IsCrashed   true
- * ID  1  B  X  118  Y   26  IsCrashed   true
- * ID 15  P  X  118  Y   26  IsCrashed   true
- * ID  3  D  X   11  Y  135  IsCrashed   true
- * ID 10  K  X   11  Y  135  IsCrashed   true
- * ID 11  L  X   63  Y   19  IsCrashed   true
- * ID 14  O  X   63  Y   19  IsCrashed   true
+ * ID  6  G  X  117  Y   62  IsCrashed   true   Crash Tick    177
+ * ID 13  N  X  117  Y   62  IsCrashed   true   Crash Tick    177
+ * ID  7  H  X   64  Y  107  IsCrashed   true   Crash Tick    363
+ * ID  0  A  X   64  Y  107  IsCrashed   true   Crash Tick    363
+ * ID 12  M  X  117  Y   53  IsCrashed   true   Crash Tick    586
+ * ID  8  I  X  117  Y   53  IsCrashed   true   Crash Tick    586
+ * ID  5  F  X  117  Y  149  IsCrashed   true   Crash Tick   1061
+ * ID  9  J  X  117  Y  149  IsCrashed   true   Crash Tick   1061
+ * ID  2  C  X   21  Y   53  IsCrashed   true   Crash Tick   2321
+ * ID 16  Q  X   21  Y   53  IsCrashed   true   Crash Tick   2321
+ * ID  1  B  X  118  Y   26  IsCrashed   true   Crash Tick   3048
+ * ID 15  P  X  118  Y   26  IsCrashed   true   Crash Tick   3048
+ * ID  3  D  X   11  Y  135  IsCrashed   true   Crash Tick   7647
+ * ID 10  K  X   11  Y  135  IsCrashed   true   Crash Tick   7647
+ * ID 11  L  X   63  Y   19  IsCrashed   true   Crash Tick  18553
+ * ID 14  O  X   63  Y   19  IsCrashed   true   Crash Tick  18553
  * 
  * Remaining mine cart
- * ID  4  E  X  138  Y   89  IsCrashed  false
+ * ID  4  E  X  138  Y   89  IsCrashed  false   Crash Tick      0
  * 
- * Result Part 1   63,19
+ * 
+ * Result Part 1   117,62
  * Result Part 2   138,89
- * 
  * 
  * </pre> 
  */
 public class Day13_MineCartMadness
 {
-  private static final String STR_COMBINE_SPACER      = "    ";
-
   private static final char   CHAR_TRACK_TURN_CURVE_2 = '/';
 
   private static final char   CHAR_MINE_CART_RIGHT    = '>';
@@ -176,6 +171,8 @@ public class Day13_MineCartMadness
 
   private static final char   CHAR_TRACK_TURN_CURVE_1 = '\\';
 
+  private static final String STR_COMBINE_SPACER      = "    ";
+
   private static final int    SET_MAP_TRACK           = 0;
 
   private static final int    SET_MAP_CARTS           = 1;
@@ -195,7 +192,7 @@ public class Day13_MineCartMadness
     test_input += ",  |      |";
     test_input += ",  \\------/";
 
-    calculatePart01( test_input, true );
+    //calculatePart01( test_input, true );
 
     String j_str = "";
 
@@ -248,8 +245,14 @@ public class Day13_MineCartMadness
      * *******************************************************************************************************
      */
 
+    /*
+     * A list for all active (=not crashed) mine carts.
+     */
     List< MineCart > mine_cart_list_active = new ArrayList< MineCart >();
 
+    /*
+     * A debug list for all crashed mine carts
+     */
     List< MineCart > mine_cart_list_crashed = new ArrayList< MineCart >();
 
     int cur_row = 0;
@@ -291,15 +294,23 @@ public class Day13_MineCartMadness
 
     MineCart first_crash_vehicle = null;
 
-    for ( int cur_tick = 0; cur_tick < 2000000; cur_tick++ )
+    for ( int cur_tick = 0; cur_tick < 100_000; cur_tick++ )
     {
       /*
-       * Do the current tick for all mine carts
+       * Do the current tick for all mine carts from the active mine cart list
        */
       for ( MineCart cur_mine_cart : mine_cart_list_active )
       {
+
+        /*
+         * Do the tick for the mine cart. 
+         * The return value is the crash status.
+         */
         knz_crash_detected = cur_mine_cart.doTick( grid_map );
 
+        /*
+         * Save the first crash
+         */
         if ( ( first_crash_vehicle == null ) && ( knz_crash_detected == 1 ) )
         {
           first_crash_vehicle = cur_mine_cart;
@@ -307,10 +318,15 @@ public class Day13_MineCartMadness
       }
 
       /*
-       * Check all mine carts for crash
+       * Check all mine carts for a crash.
+       * A crash is detected, when both mine carts are on the same coordinates.
        */
       for ( MineCart cur_mine_cart_a : mine_cart_list_active )
       {
+        /*
+         * Do the detection only if the cart a is not already marked 
+         * as crashed.
+         */
         if ( cur_mine_cart_a.isNotCrashed() )
         {
           for ( MineCart cur_mine_cart_b : mine_cart_list_active )
@@ -320,6 +336,9 @@ public class Day13_MineCartMadness
         }
       }
 
+      /*
+       * Do some debug stuff
+       */
       if ( pKnzDebug )
       {
         String debug_map_track = getDebugGridChar( grid_map, SET_MAP_TRACK, 0, 0, grid_height, grid_width );
@@ -342,8 +361,16 @@ public class Day13_MineCartMadness
       {
         MineCart cur_mine_cart_a = mine_cart_list_active.get( idx );
 
+        /*
+         * Check, wether the current mine cart is marked as crashed.
+         */
         if ( cur_mine_cart_a.isCrashed() )
         {
+          /*
+           * For debug purposes, save the current tick
+           */
+          cur_mine_cart_a.setCrashTick( cur_tick );
+
           /*
            * Clear the spot on the carts map, so other vehicles don't crash into the same spot.
            */
@@ -361,9 +388,17 @@ public class Day13_MineCartMadness
         }
         else
         {
+          /*
+           * If the mine cart is crashed, it will be removed from the active list.
+           * In this case, the index for this loop must not be increased.
+           * 
+           * If the mine cart is not crashed, the index will be increased.
+           */
           idx++;
         }
       }
+
+      wl( "Tick " + cur_tick + " Carts " + mine_cart_list_active.size() );
 
       mine_cart_list_active.sort( Comparator.comparingInt( MineCart::getSortValue ) );
 
@@ -375,6 +410,12 @@ public class Day13_MineCartMadness
         break;
       }
     }
+
+    /*
+     * *******************************************************************************************************
+     * List all the crashed and remainig mine carts for debuging purposes.
+     * *******************************************************************************************************
+     */
 
     wl( "" );
     wl( "Crashed mine carts" );
@@ -446,9 +487,11 @@ public class Day13_MineCartMadness
 
     private int              pos_col       = 0;
 
-    private char             cart_map_char = ' ';
-
     private int              id            = 0;
+
+    private int              crash_tick    = 0;
+
+    private char             cart_map_char = ' ';
 
     public MineCart( int pNr, int pRow, int pCol, char pFacing )
     {
@@ -465,40 +508,7 @@ public class Day13_MineCartMadness
       cart_map_char = "ABCDEFGHIJKLMNOPQRSTUVWYZabcdefghijklmnopqrstuvwyz".charAt( pNr );
     }
 
-    public int getSortValue()
-    {
-      return ( pos_row * 1000 ) + pos_col;
-    }
-
-    public int getID()
-    {
-      return id;
-    }
-
     private boolean is_crashed = false;
-
-    public boolean setKnzIsCrashed( MineCart pMineCartB )
-    {
-      if ( pMineCartB.getID() != this.getID() )
-      {
-        if ( pMineCartB.getSortValue() == this.getSortValue() )
-        {
-          is_crashed = true;
-        }
-      }
-
-      return is_crashed;
-    }
-
-    public boolean isCrashed()
-    {
-      return is_crashed;
-    }
-
-    public boolean isNotCrashed()
-    {
-      return is_crashed == false;
-    }
 
     private void getNewFacing()
     {
@@ -720,14 +730,57 @@ public class Day13_MineCartMadness
       pGrid[ SET_MAP_CARTS ][ pos_row ][ pos_col ] = 0;
     }
 
+    public boolean setKnzIsCrashed( MineCart pMineCartB )
+    {
+      if ( pMineCartB.getID() != this.getID() )
+      {
+        if ( pMineCartB.getSortValue() == this.getSortValue() )
+        {
+          is_crashed = true;
+        }
+      }
+
+      return is_crashed;
+    }
+
+    public boolean isCrashed()
+    {
+      return is_crashed;
+    }
+
+    public boolean isNotCrashed()
+    {
+      return is_crashed == false;
+    }
+
+    public void setCrashTick( int pValue )
+    {
+      crash_tick = pValue;
+    }
+
+    public int getCrashTick()
+    {
+      return crash_tick;
+    }
+
     public String getCurPos()
     {
       return pos_col + "," + pos_row;
     }
 
+    public int getSortValue()
+    {
+      return ( pos_row * 1000 ) + pos_col;
+    }
+
+    public int getID()
+    {
+      return id;
+    }
+
     public String toString()
     {
-      return String.format( "ID %2d  %s  X %4d  Y %4d  IsCrashed %6b", id, cart_map_char, pos_col, pos_row, is_crashed );
+      return String.format( "ID %2d  %s  X %4d  Y %4d  IsCrashed %6b   Crash Tick %6d", id, cart_map_char, pos_col, pos_row, is_crashed, crash_tick );
     }
   }
 
