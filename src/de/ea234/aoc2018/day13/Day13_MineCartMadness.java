@@ -5,8 +5,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Properties;
 import java.util.stream.Collectors;
 
 /**
@@ -17,281 +17,61 @@ import java.util.stream.Collectors;
  * 
  * https://www.reddit.com/r/adventofcode/comments/a5qd71/2018_day_13_solutions/
  * 
+ * https://github.com/ea234/Advent_of_Code_2018/blob/main/src/de/ea234/aoc2018/day13/Day13_MineCartMadness.java
+ * 
+ * ------------------------------------------------------------------------------------------
+ * 
+ * Tick 9
+ * /---\                  AA                               
+ * |   |  /----\           A    BBBB                B      
+ * | /-+--+-\  |           AAAAAA  B                       
+ * | | |  | |  |                A  B                A      
+ * \-+-/  \-+--/                BBBB                       
+ *   |      |                                              
+ *   |      |                                              
+ *   \------/                                              
+ * 
+ *
+ * Tick 12
+ * /---\                  AA                               
+ * |   |  /----\           A  BBBBBB                       
+ * | /-+--+-\  |           AAABAA  B              B        
+ * | | |  | |  |                A  B                       
+ * \-+-/  \-+--/              AAABBB              A        
+ *   |      |                                              
+ *   |      |                                              
+ *   \------/                                              
+ * 
+ * Tick 13
+ * /---\                  AA                               
+ * |   |  /----\           A  BBBBBB                       
+ * | /-+--+-\  |           AAABAA  B                       
+ * | | |  | |  |              A A  B              X        
+ * \-+-/  \-+--/              AAABBB                       
+ *   |      |                                              
+ *   |      |                                              
+ *   \------/                                              
+ * 
+ * Crash after 13 ticks
+ * 
+ * Result Part 1   7,3
+ * Result Part 2   0
+ * 
+ * 
+ * ------------------------------------------------------------------------------------------
+ * 
+ * 
+ * Crash after 177 ticks
+ * 
+ * Result Part 1   117,62
+ * Result Part 2   0
+ * 
+ * 
  * </pre> 
  */
 public class Day13_MineCartMadness
 {
-
-//  Round 0
-//                                      
-//  /---\                  A            
-//  |   |  /----\                       
-//  | /-+--+-\  |                       
-//  | | |  | |  |                       
-//  \-+-/  \-+--/                       
-//    \------/                          
-//  
-//  Round 1
-//                                      
-//  /---\                  AA           
-//  |   |  /----\                       
-//  | /-+--+-\  |                       
-//  | | |  | |  |                       
-//  \-+-/  \-+--/                       
-//    \------/                          
-//  
-//  Round 2
-//                                      
-//  /---\                  AA           
-//  |   |  /----\           A           
-//  | /-+--+-\  |                       
-//  | | |  | |  |                       
-//  \-+-/  \-+--/                       
-//    \------/                          
-//  
-//  Round 3
-//                                      
-//  /---\                  AA           
-//  |   |  /----\           A           
-//  | /-+--+-\  |           A           
-//  | | |  | |  |                       
-//  \-+-/  \-+--/                       
-//    \------/                          
-//  
-//  Round 4
-//                                      
-//  /---\                  AA           
-//  |   |  /----\           A           
-//  | /-+--+-\  |           AA          
-//  | | |  | |  |                       
-//  \-+-/  \-+--/                       
-//    \------/                          
-//  
-//  Round 5
-//                                      
-//  /---\                  AA           
-//  |   |  /----\           A           
-//  | /-+--+-\  |           AAA         
-//  | | |  | |  |                       
-//  \-+-/  \-+--/                       
-//    \------/                          
-//  
-//  Round 6
-//                                      
-//  /---\                  AA           
-//  |   |  /----\           A           
-//  | /-+--+-\  |           AAAA        
-//  | | |  | |  |                       
-//  \-+-/  \-+--/                       
-//    \------/                          
-//  
-//  Round 7
-//                                      
-//  /---\                  AA           
-//  |   |  /----\           A           
-//  | /-+--+-\  |           AAAAA       
-//  | | |  | |  |                       
-//  \-+-/  \-+--/                       
-//    \------/                          
-//  
-//  Round 8
-//                                      
-//  /---\                  AA           
-//  |   |  /----\           A           
-//  | /-+--+-\  |           AAAAAA      
-//  | | |  | |  |                       
-//  \-+-/  \-+--/                       
-//    \------/                          
-//  
-//  Round 9
-//                                      
-//  /---\                  AA           
-//  |   |  /----\           A           
-//  | /-+--+-\  |           AAAAAA      
-//  | | |  | |  |                A      
-//  \-+-/  \-+--/                       
-//    \------/                          
-//  
-//  Round 10
-//                                      
-//  /---\                  AA           
-//  |   |  /----\           A           
-//  | /-+--+-\  |           AAAAAA      
-//  | | |  | |  |                A      
-//  \-+-/  \-+--/                A      
-//    \------/                          
-//  
-//  Round 11
-//                                      
-//  /---\                  AA           
-//  |   |  /----\           A           
-//  | /-+--+-\  |           AAAAAA      
-//  | | |  | |  |                A      
-//  \-+-/  \-+--/                A      
-//    \------/                   A      
-//  
-//  Round 12
-//                                      
-//  /---\                  AA           
-//  |   |  /----\           A           
-//  | /-+--+-\  |           AAAAAA      
-//  | | |  | |  |                A      
-//  \-+-/  \-+--/                A      
-//    \------/                  AA      
-//  
-//  Round 13
-//                                      
-//  /---\                  AA           
-//  |   |  /----\           A           
-//  | /-+--+-\  |           AAAAAA      
-//  | | |  | |  |                A      
-//  \-+-/  \-+--/                A      
-//    \------/                 AAA      
-//  
-//  Round 14
-//                                      
-//  /---\                  AA           
-//  |   |  /----\           A           
-//  | /-+--+-\  |           AAAAAA      
-//  | | |  | |  |                A      
-//  \-+-/  \-+--/                A      
-//    \------/                AAAA      
-//  
-//  Round 15
-//                                      
-//  /---\                  AA           
-//  |   |  /----\           A           
-//  | /-+--+-\  |           AAAAAA      
-//  | | |  | |  |                A      
-//  \-+-/  \-+--/                A      
-//    \------/               AAAAA      
-//  
-//  Round 16
-//                                      
-//  /---\                  AA           
-//  |   |  /----\           A           
-//  | /-+--+-\  |           AAAAAA      
-//  | | |  | |  |                A      
-//  \-+-/  \-+--/                A      
-//    \------/              AAAAAA      
-//  
-//  Round 17
-//                                      
-//  /---\                  AA           
-//  |   |  /----\           A           
-//  | /-+--+-\  |           AAAAAA      
-//  | | |  | |  |                A      
-//  \-+-/  \-+--/                A      
-//    \------/             AAAAAAA      
-//  
-//  Round 18
-//                                      
-//  /---\                  AA           
-//  |   |  /----\           A           
-//  | /-+--+-\  |           AAAAAA      
-//  | | |  | |  |                A      
-//  \-+-/  \-+--/                A      
-//    \------/            AAAAAAAA      
-//  Breakpoint
-//  
-//  Round 19
-//                                      
-//  /---\                  AA           
-//  |   |  /----\           A           
-//  | /-+--+-\  |           AAAAAA      
-//  | | |  | |  |                A      
-//  \-+-/  \-+--/         A      A      
-//    \------/            AAAAAAAA      
-//  
-//  Round 20
-//                                      
-//  /---\                  AA           
-//  |   |  /----\           A           
-//  | /-+--+-\  |           AAAAAA      
-//  | | |  | |  |                A      
-//  \-+-/  \-+--/        AA      A      
-//    \------/            AAAAAAAA      
-//  
-//  Round 21
-//                                      
-//  /---\                  AA           
-//  |   |  /----\           A           
-//  | /-+--+-\  |           AAAAAA      
-//  | | |  | |  |                A      
-//  \-+-/  \-+--/       AAA      A      
-//    \------/            AAAAAAAA      
-//  
-//  Round 22
-//                                      
-//  /---\                  AA           
-//  |   |  /----\           A           
-//  | /-+--+-\  |           AAAAAA      
-//  | | |  | |  |       A        A      
-//  \-+-/  \-+--/       AAA      A      
-//    \------/            AAAAAAAA      
-//  
-//  Round 23
-//                                      
-//  /---\                  AA           
-//  |   |  /----\           A           
-//  | /-+--+-\  |       A   AAAAAA      
-//  | | |  | |  |       A        A      
-//  \-+-/  \-+--/       AAA      A      
-//    \------/            AAAAAAAA      
-//  
-//  Round 24
-//                                      
-//  /---\                  AA           
-//  |   |  /----\       A   A           
-//  | /-+--+-\  |       A   AAAAAA      
-//  | | |  | |  |       A        A      
-//  \-+-/  \-+--/       AAA      A      
-//    \------/            AAAAAAAA      
-//  
-//  Round 25
-//                                      
-//  /---\               A  AA           
-//  |   |  /----\       A   A           
-//  | /-+--+-\  |       A   AAAAAA      
-//  | | |  | |  |       A        A      
-//  \-+-/  \-+--/       AAA      A      
-//    \------/            AAAAAAAA      
-//  
-//  Round 26
-//                                      
-//  /---\               AA AA           
-//  |   |  /----\       A   A           
-//  | /-+--+-\  |       A   AAAAAA      
-//  | | |  | |  |       A        A      
-//  \-+-/  \-+--/       AAA      A      
-//    \------/            AAAAAAAA      
-//  
-//  Round 27
-//                                      
-//  /---\               AAAAA           
-//  |   |  /----\       A   A           
-//  | /-+--+-\  |       A   AAAAAA      
-//  | | |  | |  |       A        A      
-//  \-+-/  \-+--/       AAA      A      
-//    \------/            AAAAAAAA      
-//  
-//  Round 28
-//                                      
-//  /---\               AAAAA           
-//  |   |  /----\       A   A           
-//  | /-+--+-\  |       A   AAAAAA      
-//  | | |  | |  |       A        A      
-//  \-+-/  \-+--/       AAA      A      
-//    \------/            AAAAAAAA      
-//  
-//  Round 29
-//                                      
-//  /---\               AAAAA           
-//  |   |  /----\       A   A           
-//  | /-+--+-\  |       A   AAAAAA      
-//  | | |  | |  |       A        A      
-//  \-+-/  \-+--/       AAA      A      
-//    \------/            AAAAAAAA      
+  private static final String STR_COMBINE_SPACER      = "    ";
 
   private static final char   CHAR_MINE_CART_RIGHT    = '>';
 
@@ -303,6 +83,8 @@ public class Day13_MineCartMadness
 
   private static final char   CHAR_TRACK_HORIZONTAL   = '-';
 
+  private static final char   CHAR_CRASH              = 'X';
+
   private static final char   CHAR_TRACK_VERTICAL     = '|';
 
   private static final char   CHAR_TRACK_CROSSING     = '+';
@@ -312,25 +94,29 @@ public class Day13_MineCartMadness
   private static final char   CHAR_TRACK_TURN_CURVE_1 = '\\';
 
   private static final char   CHAR_TRACK_TURN_CURVE_2 = '/';
-
-  private static final String STR_COMBINE_SPACER      = "    ";
-
+ 
   private static final int    SET_MAP_TRACK           = 0;
 
   private static final int    SET_MAP_CARTS           = 1;
+
+  private static final int    SET_MAP_TRAIL           = 2;
 
   public static void main( String[] args )
   {
     String test_input = "";
 
-    test_input += ",/->-\\           ";
+    test_input += "/->-\\           ";
     test_input += ",|   |  /----\\";
     test_input += ",| /-+--+-\\  |";
-    test_input += ",| | |  | |  |";
+    test_input += ",| | |  | v  |";
     test_input += ",\\-+-/  \\-+--/";
+    test_input += ",  |      |";
+    test_input += ",  |      |";
     test_input += ",  \\------/";
 
     calculatePart01( test_input, true );
+
+    calculate01( getListProd(), false );
 
     System.exit( 0 );
   }
@@ -347,9 +133,13 @@ public class Day13_MineCartMadness
     wl( "" );
     wl( "------------------------------------------------------------------------------------------" );
 
-    long result_part_01 = 0;
-
     long result_part_02 = 0;
+
+    /*
+     * *******************************************************************************************************
+     * Determine the grid size
+     * *******************************************************************************************************
+     */
 
     int grid_height = pListInput.size();
     int grid_width = 0;
@@ -359,39 +149,38 @@ public class Day13_MineCartMadness
       grid_width = Math.max( grid_width, input_str.length() );
     }
 
-    List< MineCart > l_ca = new ArrayList< MineCart >();
+    int[][][] grid_map = new int[ 3 ][ grid_height ][ grid_width ];
 
-    int[][][] grid_map = new int[ 2 ][ grid_height ][ grid_width ];
+    /*
+     * *******************************************************************************************************
+     * Getting the map from the input list and building the list of mine carts
+     * *******************************************************************************************************
+     */
+
+    List< MineCart > mine_cart_list = new ArrayList< MineCart >();
 
     int cur_row = 0;
 
     for ( String input_str : pListInput )
     {
-      if ( pKnzDebug )
+      for ( int cur_idx = 0; cur_idx < input_str.length(); cur_idx++ )
       {
-        wl( input_str );
+        char cur_char = input_str.charAt( cur_idx );
 
-        grid_width = Math.max( grid_width, input_str.length() );
-
-        for ( int cur_idx = 0; cur_idx < input_str.length(); cur_idx++ )
+        if ( ( cur_char == CHAR_MINE_CART_LEFT ) || ( cur_char == CHAR_MINE_CART_RIGHT ) )
         {
-          char cur_char = input_str.charAt( cur_idx );
+          mine_cart_list.add( new MineCart( mine_cart_list.size(), cur_row, cur_idx, cur_char ) );
 
-          if ( ( cur_char == CHAR_MINE_CART_LEFT ) || ( cur_char == CHAR_MINE_CART_RIGHT ) )
-          {
-            l_ca.add( new MineCart( l_ca.size(), cur_row, cur_idx, cur_char ) );
-
-            cur_char = CHAR_TRACK_HORIZONTAL;
-          }
-          else if ( ( cur_char == CHAR_MINE_CART_UP ) || ( cur_char == CHAR_MINE_CART_DOWN ) )
-          {
-            l_ca.add( new MineCart( l_ca.size(), cur_row, cur_idx, cur_char ) );
-
-            cur_char = CHAR_TRACK_VERTICAL;
-          }
-
-          grid_map[ SET_MAP_TRACK ][ cur_row ][ cur_idx ] = cur_char;
+          cur_char = CHAR_TRACK_HORIZONTAL;
         }
+        else if ( ( cur_char == CHAR_MINE_CART_UP ) || ( cur_char == CHAR_MINE_CART_DOWN ) )
+        {
+          mine_cart_list.add( new MineCart( mine_cart_list.size(), cur_row, cur_idx, cur_char ) );
+
+          cur_char = CHAR_TRACK_VERTICAL;
+        }
+
+        grid_map[ SET_MAP_TRACK ][ cur_row ][ cur_idx ] = cur_char;
       }
 
       cur_row++;
@@ -399,30 +188,57 @@ public class Day13_MineCartMadness
 
     wl( "" );
 
-    for ( int cur_round = 0; cur_round < 30; cur_round++ )
+    /*
+     * *******************************************************************************************************
+     * Doing the ticks and crash detection
+     * *******************************************************************************************************
+     */
+
+    int knz_crash_detected = 0;
+
+    MineCart crash_vehicle = null;
+
+    for ( int cur_tick = 0; cur_tick < 200; cur_tick++ )
     {
-      if ( cur_round == 19 )
+      for ( MineCart cur_mine_cart : mine_cart_list )
       {
-        wl( "Breakpoint" );
+        knz_crash_detected = cur_mine_cart.doTick( grid_map );
+
+        if ( knz_crash_detected == 1 )
+        {
+          crash_vehicle = cur_mine_cart;
+        }
       }
 
-      for ( MineCart cur_cart : l_ca )
+      if ( pKnzDebug )
       {
-        cur_cart.doTick( grid_map );
+        String debug_map_track = getDebugGridChar( grid_map, SET_MAP_TRACK, 0, 0, grid_height, grid_width );
+
+        String debug_map_trail = getDebugGridChar( grid_map, SET_MAP_TRAIL, 0, 0, grid_height, grid_width );
+
+        String debug_map_carts = getDebugGridChar( grid_map, SET_MAP_CARTS, 0, 0, grid_height, grid_width );
+
+        wl( "" );
+        wl( "Tick " + cur_tick );
+        wl( combineStrings( combineStrings( debug_map_track, debug_map_trail ), debug_map_carts ) );
       }
 
-      String debug_map_track = getDebugGridChar( grid_map, SET_MAP_TRACK, 0, 0, grid_height, grid_width );
+      if ( crash_vehicle == null )
+      {
+        mine_cart_list.sort( Comparator.comparingInt( MineCart::getSortValue ) );
+      }
+      else
+      {
+        wl( "" );
+        wl( "Crash after " + cur_tick + " ticks" );
 
-      String debug_map_carts = getDebugGridChar( grid_map, SET_MAP_CARTS, 0, 0, grid_height, grid_width );
-
-      wl( "" );
-      wl( "Round " + cur_round );
-      wl( combineStrings( debug_map_track, debug_map_carts ) );
+        break;
+      }
     }
 
     wl( "" );
-    wl( "Result Part 1 " + result_part_01 );
-    wl( "Result Part 2 " + result_part_02 );
+    wl( "Result Part 1   " + ( crash_vehicle == null ? "-----" : crash_vehicle.getCurPos() ) );
+    wl( "Result Part 2   " + result_part_02 );
     wl( "" );
   }
 
@@ -452,31 +268,31 @@ public class Day13_MineCartMadness
 
   private static class MineCart
   {
-    private static final int TURN_LEFT        = 1;
+    private static final int TURN_LEFT     = 1;
 
-    private static final int STRAIGHT         = 2;
+    private static final int STRAIGHT      = 2;
 
-    private static final int TURN_RIGHT       = 3;
+    private static final int TURN_RIGHT    = 3;
 
-    public static final char FACING_UP        = '^';
+    public static final char FACING_UP     = '^';
 
-    public static final char FACING_DOWN      = 'v';
+    public static final char FACING_DOWN   = 'v';
 
-    public static final char FACING_LEFT      = '<';
+    public static final char FACING_LEFT   = '<';
 
-    public static final char FACING_RIGHT     = '>';
+    public static final char FACING_RIGHT  = '>';
 
-    private int              pos_turning      = 0;
+    private int              pos_turning   = 0;
 
-    private char             pos_facing       = 0;
+    private char             pos_facing    = 0;
 
-    private int              pos_row          = 0;
+    private int              pos_row       = 0;
 
-    private int              pos_col          = 0;
+    private int              pos_col       = 0;
 
-    private char             char_coordinates = ' ';
+    private char             cart_map_char = ' ';
 
-    private int              id               = 0;
+    private int              id            = 0;
 
     public MineCart( int pNr, int pRow, int pCol, char pFacing )
     {
@@ -490,18 +306,16 @@ public class Day13_MineCartMadness
 
       id = pNr;
 
-      char_coordinates = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".charAt( pNr );
-
+      cart_map_char = "ABCDEFGHIJKLMNOPQRSTUVWYZabcdefghijklmnopqrstuvwyz".charAt( pNr );
     }
 
-    public char getCharX()
+    public int getSortValue()
     {
-      return char_coordinates;
+      return ( pos_row * 1000 ) + pos_col;
     }
 
     private void getNewFacing()
     {
-
       /*
        * Each time a cart has the option to turn, it turns
        * 
@@ -510,6 +324,9 @@ public class Day13_MineCartMadness
        *   - right the third time
        *   
        * and then repeats those directions
+       * 
+       * 
+       * If the turning mode is STRAIGHT, the facing doesn't change.
        */
       if ( pos_facing == FACING_UP )
       {
@@ -534,6 +351,10 @@ public class Day13_MineCartMadness
 
       /*
        * Set the turning mode, for the next crossing
+       * 
+       * LEFT    -> STRAIGHT
+       * STRAIGT -> RIGHT
+       * RIGHT   -> LEFT
        */
       if ( pos_turning == TURN_LEFT )
       {
@@ -541,39 +362,29 @@ public class Day13_MineCartMadness
       }
       else if ( pos_turning == STRAIGHT )
       {
-        pos_turning = FACING_RIGHT;
+        pos_turning = TURN_RIGHT;
       }
       else
       {
         pos_turning = TURN_LEFT;
       }
     }
-    private void doTick( int[][][] pGrid )
+
+    private int doTick( int[][][] pGrid )
     {
       /*
        * **********************************************************************
        * First: Handle the Facing
        * - Crossing
        * - Curves
-       * 
-       *            111
-       *  0123456789012
-       * 0/---\        
-       * 1|   |  /----\
-       * 2| /-+--+-\  |
-       * 3| | |  X |  |
-       * 4\-+-/  \-+--/
-       * 5  \------/
-      
        * **********************************************************************
        */
 
-      /*
-       * Check Crossing
-       * If the cart is positioned on a crossing, get a new facing
-       */
       if ( pGrid[ SET_MAP_TRACK ][ pos_row ][ pos_col ] == CHAR_TRACK_CROSSING )
       {
+        /*
+         * If the cart is on a crossing, get a new facing
+         */
         getNewFacing();
       }
       else if ( pGrid[ SET_MAP_TRACK ][ pos_row ][ pos_col ] == CHAR_TRACK_TURN_CURVE_1 ) // '\'
@@ -668,43 +479,59 @@ public class Day13_MineCartMadness
         }
       }
 
-      int next_pos_row = pos_row;
-      int next_pos_col = pos_col;
+      /*
+       * Clear the position on old coordinates
+       */
+      pGrid[ SET_MAP_CARTS ][ pos_row ][ pos_col ] = 0;
 
+      /*
+       * Get the new position from the facing
+       */
       if ( pos_facing == FACING_LEFT )
       {
-        next_pos_col--;
+        pos_col--;
       }
       else if ( pos_facing == FACING_RIGHT )
       {
-        next_pos_col++;
+        pos_col++;
       }
       else if ( pos_facing == FACING_UP )
       {
-        next_pos_row--;
+        pos_row--;
       }
       else if ( pos_facing == FACING_DOWN )
       {
-        next_pos_row++;
+        pos_row++;
       }
 
-      pGrid[ SET_MAP_CARTS ][ next_pos_row ][ next_pos_col ] = char_coordinates;
+      int knz_crash_detected = 0;
 
-      pos_row = next_pos_row;
-      pos_col = next_pos_col;
+      if ( pGrid[ SET_MAP_CARTS ][ pos_row ][ pos_col ] > 0 )
+      {
+        /*
+         * If the new coordinations are occupied, a crash is detected.
+         * Set the crash-detection-variable to 1.
+         */
+        pGrid[ SET_MAP_CARTS ][ pos_row ][ pos_col ] = CHAR_CRASH;
+
+        knz_crash_detected = 1;
+      }
+      else
+      {
+        /*
+         * If the new coordinates are free, set the mine cart char.
+         */
+        pGrid[ SET_MAP_CARTS ][ pos_row ][ pos_col ] = cart_map_char;
+      }
+
+      pGrid[ SET_MAP_TRAIL ][ pos_row ][ pos_col ] = cart_map_char;
+
+      return knz_crash_detected;
     }
 
-    private int getChar( int[][][] pGrid, int pSet, int pRow, int pCol )
+    public String getCurPos()
     {
-      try
-      {
-        return pGrid[ pSet ][ pRow ][ pCol ];
-      }
-      catch ( IndexOutOfBoundsException exp )
-      {
-      }
-
-      return -1;
+      return pos_col + "," + pos_row;
     }
   }
 
@@ -740,6 +567,8 @@ public class Day13_MineCartMadness
     List< String > string_array = null;
 
     String datei_input = "/mnt/hd4tbb/daten/zdownload/advent_of_code_2018__day13_input.txt";
+
+    datei_input = "C:/Daten/00_Daten/advent_of_code_2018__day13_input.txt";
 
     try
     {
