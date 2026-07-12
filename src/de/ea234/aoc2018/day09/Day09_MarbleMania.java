@@ -215,9 +215,9 @@ public class Day09_MarbleMania
 
     long cur_marble_nr = 0;
 
-    Marble cur_marble0 = new Marble( 0 );
+    Marble start_marble_0 = new Marble( 0 );
 
-    Marble cur_marble = cur_marble0;
+    Marble cur_marble     = start_marble_0;
 
     while ( cur_marble_nr <= pValueLastMarble )
     {
@@ -270,7 +270,7 @@ public class Day09_MarbleMania
         /*
          * Go 7 counter clockwise (=previous element) in the circular list
          */
-        for ( int step_ins_count = 0; step_ins_count < 6; step_ins_count++ )
+        for ( int step_count = 0; step_count < 7; step_count++ )
         {
           cur_marble = cur_marble.getPrev();
         }
@@ -288,30 +288,29 @@ public class Day09_MarbleMania
         /*
          * Since the "next" reference is still valid, the next 
          * current marble is still get with the "getNext()" Method.
-         * 
-         * ... hmmm, why the call to the "getPrev" Method ... because it worked for me
          */
-        cur_marble = cur_marble.getPrev();
+        cur_marble = cur_marble.getNext();
       }
       else
       {
         /* 
          * If the marble is not a multiple of 23, 
          * place the marble into the list.
-         * 
-         * Into the circle between the marbles that are 1 and 2 marbles clockwise of the current marble.
-         * 
-         * ... hmmm, why the call of "getNext()" twice ... because it worked for me
          */
 
-        cur_marble = cur_marble.getNext();
+        /*
+         * From the current marble, get the next marble in the list
+         */
         cur_marble = cur_marble.getNext();
 
-        cur_marble.insertX( new Marble( cur_marble_nr ) );
+        /*
+         * Insert a new marble, which is returned as new current marble
+         */
+        cur_marble = cur_marble.insertX( new Marble( cur_marble_nr ) );
 
         if ( pKnzDebug )
         {
-          wl( String.format( "Marble Number %3d | List %s", cur_marble_nr, toString( cur_marble0, 30 ) ) );
+          wl( String.format( "Marble Number %3d | List %s", cur_marble_nr, toString( start_marble_0, 30 ) ) );
         }
       }
     }
@@ -453,7 +452,7 @@ public class Day09_MarbleMania
       return value;
     }
 
-    public void insertX( Marble pInstanceToInsert )
+    public Marble insertX( Marble pInstanceToInsert )
     {
       Marble old_next_instance = next;
 
@@ -464,6 +463,8 @@ public class Day09_MarbleMania
       old_next_instance.setPrev( pInstanceToInsert );
 
       pInstanceToInsert.setNext( old_next_instance );
+      
+      return pInstanceToInsert;
     }
 
     public void removeX()
